@@ -11,8 +11,10 @@
         :root {
             --gold: #D4AF37;
             --dark-gold: #B8860B;
-            --black: #000000;
-            --dark-gray: #2c2c2c;
+            --mariage: #e83e8c;
+            --bapteme: #17a2b8;
+            --anniversaire: #28a745;
+            --autre: #6c757d;
         }
         
         body {
@@ -59,6 +61,15 @@
             background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
             color: white;
             padding: 15px;
+        }
+        
+        .event-type-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.8rem;
+            margin-left: 10px;
         }
         
         .event-image {
@@ -112,26 +123,10 @@
             border-radius: 4px;
         }
         
-        .badge-passe {
-            background-color: #ffc107;
-            color: black;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .event-image {
-                height: 150px;
-            }
-            
-            .btn {
-                width: 100%;
-                margin-bottom: 5px;
-            }
+            .container { padding: 10px; }
+            .event-image { height: 150px; }
+            .btn { width: 100%; margin-bottom: 5px; }
         }
     </style>
 </head>
@@ -143,7 +138,6 @@
             }
         })();
 
-        // Données des événements
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
         let photoBase64 = '';
         
@@ -152,13 +146,24 @@
             afficherEvenements();
         }
         
-        function convertirImageEnBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+        function getEventColor(type) {
+            const colors = {
+                'mariage': '#e83e8c',
+                'bapteme': '#17a2b8',
+                'anniversaire': '#28a745',
+                'autre': '#6c757d'
+            };
+            return colors[type] || '#D4AF37';
+        }
+        
+        function getEventIcon(type) {
+            const icons = {
+                'mariage': 'fas fa-heart',
+                'bapteme': 'fas fa-dove',
+                'anniversaire': 'fas fa-birthday-cake',
+                'autre': 'fas fa-calendar-check'
+            };
+            return icons[type] || 'fas fa-calendar';
         }
     </script>
 
@@ -178,7 +183,6 @@
     </nav>
 
     <div class="container mt-4">
-        <!-- Bouton d'ajout -->
         <div class="row mb-4">
             <div class="col-12">
                 <button class="btn btn-gold" onclick="ajouterEvenement()">
@@ -187,7 +191,6 @@
             </div>
         </div>
         
-        <!-- Liste des événements -->
         <div class="row" id="evenementsContainer"></div>
     </div>
 
@@ -214,7 +217,6 @@
                 return;
             }
             
-            // Trier par date (du plus récent au plus ancien)
             evenements.sort((a, b) => new Date(b.date) - new Date(a.date));
             
             evenements.forEach((event, index) => {
@@ -229,18 +231,27 @@
                 if (estArchive) {
                     badgeClass = 'badge-archive';
                     badgeTexte = 'Archivé';
-                } else if (estPasse) {
-                    badgeClass = 'badge-passe';
-                    badgeTexte = 'Passé';
                 }
+                
+                const eventColor = getEventColor(event.type);
+                const eventIcon = getEventIcon(event.type);
                 
                 container.innerHTML += `
                     <div class="col-md-6 mb-4">
                         <div class="event-card">
                             <div class="event-header">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">${event.nom}</h5>
+                                    <h5 class="mb-0">
+                                        <i class="${eventIcon} me-2"></i>
+                                        ${event.nom}
+                                    </h5>
                                     <span class="badge ${badgeClass}">${badgeTexte}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="event-type-badge" style="background-color: ${eventColor}">
+                                        <i class="${eventIcon} me-1"></i>
+                                        ${event.type || 'Mariage'}
+                                    </span>
                                 </div>
                             </div>
                             <img src="${event.photo || 'https://via.placeholder.com/800x400?text=Photo+non+disponible'}" 
@@ -285,12 +296,16 @@
         }
         
         function ajouterEvenement() {
-            let photoInput = '';
-            
             Swal.fire({
                 title: 'Nouvel événement',
                 html: `
                     <input type="text" id="nom" class="swal2-input" placeholder="Nom de l'événement" value="Nouvel événement">
+                    <select id="type" class="swal2-select" style="width:100%; margin-bottom:10px;">
+                        <option value="mariage">💍 Mariage</option>
+                        <option value="bapteme">🕊️ Baptême</option>
+                        <option value="anniversaire">🎂 Anniversaire</option>
+                        <option value="autre">📅 Autre</option>
+                    </select>
                     <input type="date" id="date" class="swal2-input" value="${new Date().toISOString().split('T')[0]}">
                     <input type="time" id="heure" class="swal2-input" value="19:00">
                     <input type="text" id="lieu" class="swal2-input" placeholder="Lieu">
@@ -300,7 +315,7 @@
                     <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
                         <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                         <p>Cliquez pour choisir une photo</p>
-                        <input type="file" id="photoFile" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+                        <input type="file" id="photoFile" accept="image/*" style="display: none;">
                     </div>
                     <img id="photoPreview" class="photo-preview" style="display: none;">
                 `,
@@ -309,7 +324,6 @@
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
                 didOpen: () => {
-                    // Ajouter l'écouteur d'événement pour le fichier
                     document.getElementById('photoFile').addEventListener('change', function(e) {
                         const file = e.target.files[0];
                         if (file) {
@@ -333,6 +347,7 @@
                     evenements.push({
                         id: Date.now(),
                         nom: nom,
+                        type: document.getElementById('type').value,
                         date: document.getElementById('date').value,
                         heure: document.getElementById('heure').value,
                         lieu: document.getElementById('lieu').value,
@@ -356,6 +371,12 @@
                 title: 'Modifier l\'événement',
                 html: `
                     <input type="text" id="nom" class="swal2-input" value="${event.nom}">
+                    <select id="type" class="swal2-select" style="width:100%; margin-bottom:10px;">
+                        <option value="mariage" ${event.type === 'mariage' ? 'selected' : ''}>💍 Mariage</option>
+                        <option value="bapteme" ${event.type === 'bapteme' ? 'selected' : ''}>🕊️ Baptême</option>
+                        <option value="anniversaire" ${event.type === 'anniversaire' ? 'selected' : ''}>🎂 Anniversaire</option>
+                        <option value="autre" ${event.type === 'autre' ? 'selected' : ''}>📅 Autre</option>
+                    </select>
                     <input type="date" id="date" class="swal2-input" value="${event.date}">
                     <input type="time" id="heure" class="swal2-input" value="${event.heure}">
                     <input type="text" id="lieu" class="swal2-input" value="${event.lieu}">
@@ -365,7 +386,7 @@
                     <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
                         <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                         <p>Cliquez pour changer la photo</p>
-                        <input type="file" id="photoFile" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+                        <input type="file" id="photoFile" accept="image/*" style="display: none;">
                     </div>
                     <img id="photoPreview" class="photo-preview" src="${event.photo}" style="display: block;">
                 `,
@@ -390,6 +411,7 @@
                     evenements[index] = {
                         ...event,
                         nom: document.getElementById('nom').value,
+                        type: document.getElementById('type').value,
                         date: document.getElementById('date').value,
                         heure: document.getElementById('heure').value,
                         lieu: document.getElementById('lieu').value,
@@ -401,19 +423,6 @@
                     sauvegarder();
                 }
             });
-        }
-        
-        function previewPhoto(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('photoPreview').src = e.target.result;
-                    document.getElementById('photoPreview').style.display = 'block';
-                    photoBase64 = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
         }
         
         function dupliquerEvenement(index) {

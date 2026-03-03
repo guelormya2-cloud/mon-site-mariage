@@ -91,7 +91,6 @@
             }
         })();
 
-        // Données partagées
         let invites = JSON.parse(localStorage.getItem('invites')) || [];
         let tables = JSON.parse(localStorage.getItem('tables')) || [];
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
@@ -101,14 +100,27 @@
             afficherInvites();
         }
         
-        // GÉNÉRER UN LIEN PUBLIC avec paramètres
         function genererLienInvitation(invite) {
             const baseUrl = window.location.origin + window.location.pathname.replace('gestion-invites.html', 'invitation.html');
+            
+            // Récupérer l'événement associé
+            const evenement = evenements.find(e => e.id === invite.evenementId) || {};
+            
             const params = new URLSearchParams({
                 id: invite.id,
-                nom: invite.nom,
+                nom: invite.nom || '',
                 evenementId: invite.evenementId || '',
+                evenementNom: evenement.nom || 'Mariage',
+                evenementType: evenement.type || 'mariage',
+                evenementDate: evenement.date || '',
+                evenementHeure: evenement.heure || '',
+                evenementLieu: evenement.lieu || '',
+                evenementAdresse: evenement.adresse || '',
+                evenementTelephone: evenement.telephone || '',
+                evenementEmail: evenement.email || '',
+                evenementPhoto: evenement.photo || '',
                 tableId: invite.tableId || '',
+                tableNom: tables.find(t => t.id === invite.tableId)?.nom || '',
                 email: invite.email || '',
                 telephone: invite.telephone || '',
                 boisson1: invite.boisson1 || '',
@@ -137,7 +149,6 @@
     </nav>
 
     <div class="container mt-4">
-        <!-- Filtres -->
         <div class="filters">
             <div class="row g-2">
                 <div class="col-md-4">
@@ -160,13 +171,12 @@
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-gold w-100" onclick="ajouterInvite()">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus"></i> Ajouter
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Liste des invités -->
         <div id="invitesContainer"></div>
     </div>
 
@@ -182,25 +192,14 @@
             
             let invitesFiltres = invites;
             
-            if (filtreEvenement) {
-                invitesFiltres = invitesFiltres.filter(i => i.evenementId == filtreEvenement);
-            }
-            if (filtreTable) {
-                invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
-            }
-            if (filtreConfirmation) {
-                invitesFiltres = invitesFiltres.filter(i => i.confirmation === filtreConfirmation);
-            }
+            if (filtreEvenement) invitesFiltres = invitesFiltres.filter(i => i.evenementId == filtreEvenement);
+            if (filtreTable) invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
+            if (filtreConfirmation) invitesFiltres = invitesFiltres.filter(i => i.confirmation === filtreConfirmation);
             
             container.innerHTML = '';
             
             if (invitesFiltres.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas fa-users fa-4x text-muted mb-3"></i>
-                        <h5>Aucun invité trouvé</h5>
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-center py-5"><i class="fas fa-users fa-4x text-muted mb-3"></i><h5>Aucun invité trouvé</h5></div>`;
                 return;
             }
             
@@ -259,9 +258,6 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-                            <div class="mt-2">
-                                <small class="text-muted">Lien: ${lien.substring(0, 50)}...</small>
-                            </div>
                         </div>
                     </div>
                 `;
@@ -276,7 +272,7 @@
             const evenementsActifs = evenements.filter(e => !e.archive && e.date >= aujourdhui);
             
             evenementsActifs.forEach(e => {
-                evenementOptions += `<option value="${e.id}">${e.nom} (${e.date})</option>`;
+                evenementOptions += `<option value="${e.id}">${e.nom} (${e.type || 'Mariage'}) - ${e.date}</option>`;
             });
             
             tables.forEach(t => {
@@ -417,7 +413,7 @@
                 return;
             }
             const sujet = "Votre invitation";
-            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation : ${decodeURIComponent(lien)}`;
+            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation et confirmer votre présence : ${decodeURIComponent(lien)}`;
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
         }
         
@@ -432,7 +428,7 @@
         const filtreTable = document.getElementById('filtreTable');
         
         evenements.forEach(e => {
-            filtreEvenement.innerHTML += `<option value="${e.id}">${e.nom}</option>`;
+            filtreEvenement.innerHTML += `<option value="${e.id}">${e.nom} (${e.type || 'Mariage'})</option>`;
         });
         
         tables.forEach(t => {
