@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Equinoxe Events</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        
+        .login-container {
+            max-width: 450px;
+            width: 90%;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            border: 1px solid var(--gold);
+        }
+        
+        .login-header {
+            text-align: center;
+            padding: 30px 20px 20px;
+        }
+        
+        .login-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--black);
+        }
+        
+        .gold-line {
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+            margin: 15px auto;
+        }
+        
+        .login-form {
+            padding: 20px 30px 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+        
+        .input-group {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: none;
+        }
+        
+        .form-control {
+            border: none;
+            padding: 10px 15px;
+        }
+        
+        .btn-login {
+            background-color: var(--gold);
+            border: none;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+        }
+        
+        .btn-login:hover {
+            background-color: var(--dark-gold);
+        }
+        
+        .brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+        }
+        
+        @media (max-width: 576px) {
+            .login-form { padding: 20px; }
+            .brand-logo { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="text-center mb-4">
+            <div class="brand-logo">Equinoxe Events</div>
+        </div>
+        
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Connexion</h2>
+                <div class="gold-line"></div>
+                <p>Accédez à votre tableau de bord</p>
+            </div>
+            
+            <div class="login-form">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="email" class="form-control" id="email" 
+                                   value="guelormuya2@gmail.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" class="form-control" id="password" 
+                                   value="Glm@1991" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login">Se connecter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (email === "guelormuya2@gmail.com" && password === "Glm@1991") {
+                window.location.href = 'dashboard.html';
+            } else {
+                alert("Email ou mot de passe incorrect");
+            }
+        }
+    </script>
+</body>
+</html>
