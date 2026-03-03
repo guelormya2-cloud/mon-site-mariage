@@ -11,26 +11,38 @@
         :root {
             --gold: #D4AF37;
             --dark-gold: #B8860B;
-            --mariage: #e83e8c;
-            --bapteme: #17a2b8;
-            --anniversaire: #28a745;
-            --autre: #6c757d;
         }
         
         body {
             font-family: 'Montserrat', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px 0;
+            padding: 0;
+            margin: 0;
         }
         
         .invitation-card {
             background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             max-width: 800px;
             margin: 0 auto;
+        }
+        
+        .photo-hero {
+            width: 100%;
+            height: 400px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .photo-hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to top, white, transparent);
         }
         
         .invitation-header {
@@ -38,7 +50,10 @@
             color: white;
             padding: 40px 20px;
             text-align: center;
+            margin-top: -50px;
             position: relative;
+            z-index: 10;
+            border-radius: 30px 30px 0 0;
         }
         
         .invitation-header h1 {
@@ -48,34 +63,24 @@
         }
         
         .event-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            display: inline-block;
             background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
+            padding: 8px 20px;
             border-radius: 50px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             backdrop-filter: blur(5px);
+            margin-bottom: 20px;
         }
         
-        .couple-photo {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 5px solid white;
-            margin: -100px auto 20px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .content-section {
+            padding: 30px;
         }
         
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
-            padding: 30px;
+            margin: 30px 0;
         }
         
         .info-item {
@@ -101,12 +106,12 @@
             color: white;
             padding: 15px;
             border-radius: 10px;
-            margin: 0 30px 30px;
+            margin: 20px 0;
             text-align: center;
         }
         
         .boissons-section {
-            padding: 0 30px 30px;
+            margin: 30px 0;
         }
         
         .boisson-option {
@@ -129,15 +134,11 @@
             background: rgba(212, 175, 55, 0.1);
         }
         
-        .boisson-option input {
-            margin-right: 10px;
-        }
-        
         .btn-gold {
             background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
             border: none;
             color: white;
-            padding: 12px 30px;
+            padding: 15px;
             border-radius: 50px;
             font-weight: 600;
             width: 100%;
@@ -154,7 +155,7 @@
             border: 2px solid var(--gold);
             background: transparent;
             color: var(--gold);
-            padding: 12px 30px;
+            padding: 15px;
             border-radius: 50px;
             font-weight: 600;
             width: 100%;
@@ -170,7 +171,7 @@
             background: #333;
             color: white;
             padding: 30px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
         
         .contact-info a {
@@ -181,7 +182,7 @@
         .confirmation-status {
             padding: 15px;
             border-radius: 10px;
-            margin: 20px 30px;
+            margin: 20px 0;
             text-align: center;
         }
         
@@ -203,22 +204,30 @@
             border: 1px solid #ffeaa7;
         }
         
+        .message-personnalise {
+            font-size: 1.2rem;
+            font-style: italic;
+            color: #666;
+            border-left: 4px solid var(--gold);
+            padding-left: 20px;
+            margin: 30px 0;
+        }
+        
         @media (max-width: 768px) {
+            .photo-hero { height: 250px; }
             .invitation-header h1 { font-size: 1.8rem; }
-            .couple-photo { width: 150px; height: 150px; margin-top: -75px; }
-            .info-grid { grid-template-columns: 1fr; padding: 20px; }
+            .invitation-header { margin-top: -30px; padding: 30px 15px; }
+            .content-section { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="loading" class="text-center py-5">
-            <div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>
-            <p class="text-white mt-3">Chargement de votre invitation...</p>
-        </div>
-        
-        <div id="content" style="display: none;"></div>
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;"></div>
+        <p class="text-white mt-3">Chargement de votre invitation...</p>
     </div>
+    
+    <div id="content" style="display: none;"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
@@ -230,10 +239,9 @@
         const invite = {
             id: urlParams.get('id'),
             nom: urlParams.get('nom') || 'Invité',
-            evenementId: urlParams.get('evenementId'),
-            tableNom: urlParams.get('tableNom'),
             email: urlParams.get('email'),
             telephone: urlParams.get('telephone'),
+            tableNom: urlParams.get('tableNom'),
             boisson1: urlParams.get('boisson1') || '',
             boisson2: urlParams.get('boisson2') || '',
             message: urlParams.get('message') || '',
@@ -249,74 +257,38 @@
             adresse: urlParams.get('evenementAdresse') || 'Kinshasa',
             telephone: urlParams.get('evenementTelephone') || '+243 82 124 8030',
             email: urlParams.get('evenementEmail') || 'contact@mariage.com',
-            photo: urlParams.get('evenementPhoto') || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80'
+            photo: urlParams.get('evenementPhoto') || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+            messagePersonnalise: urlParams.get('evenementMessage') || ''
         };
         
-        // Icône selon le type d'événement
-        function getEventIcon(type) {
-            const icons = {
-                'mariage': 'fas fa-heart',
-                'bapteme': 'fas fa-dove',
-                'anniversaire': 'fas fa-birthday-cake',
-                'autre': 'fas fa-calendar-check'
-            };
-            return icons[type] || 'fas fa-calendar';
+        document.getElementById('loading').style.display = 'none';
+        
+        let confirmationClass = 'attente';
+        let confirmationTexte = 'En attente de confirmation';
+        
+        if (invite.confirmation === 'oui') {
+            confirmationClass = 'confirme';
+            confirmationTexte = '✓ Présence confirmée';
+        } else if (invite.confirmation === 'refuse') {
+            confirmationClass = 'refuse';
+            confirmationTexte = '✗ Présence refusée';
         }
         
-        // Couleur selon le type d'événement
-        function getEventColor(type) {
-            const colors = {
-                'mariage': '#e83e8c',
-                'bapteme': '#17a2b8',
-                'anniversaire': '#28a745',
-                'autre': '#6c757d'
-            };
-            return colors[type] || '#D4AF37';
-        }
-        
-        if (!invite.id) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').innerHTML = `
-                <div class="invitation-card">
-                    <div class="invitation-header">
-                        <h1>Invitation</h1>
-                    </div>
-                    <div class="text-center py-5">
-                        <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
-                        <h3>Lien invalide</h3>
-                        <p class="text-muted">Veuillez contacter l'organisateur</p>
-                    </div>
+        document.getElementById('content').innerHTML = `
+            <div class="invitation-card">
+                <div class="photo-hero" style="background-image: url('${evenement.photo}')"></div>
+                
+                <div class="invitation-header">
+                    <span class="event-badge">
+                        <i class="fas ${evenement.type === 'mariage' ? 'fa-heart' : evenement.type === 'bapteme' ? 'fa-dove' : evenement.type === 'anniversaire' ? 'fa-birthday-cake' : 'fa-calendar'} me-2"></i>
+                        ${evenement.type.charAt(0).toUpperCase() + evenement.type.slice(1)}
+                    </span>
+                    <h1>${evenement.nom}</h1>
+                    <p class="lead">Vous invitent à célébrer cet événement</p>
                 </div>
-            `;
-            document.getElementById('content').style.display = 'block';
-        } else {
-            document.getElementById('loading').style.display = 'none';
-            
-            let confirmationClass = 'attente';
-            let confirmationTexte = 'En attente de confirmation';
-            
-            if (invite.confirmation === 'oui') {
-                confirmationClass = 'confirme';
-                confirmationTexte = '✓ Présence confirmée';
-            } else if (invite.confirmation === 'refuse') {
-                confirmationClass = 'refuse';
-                confirmationTexte = '✗ Présence refusée';
-            }
-            
-            document.getElementById('content').innerHTML = `
-                <div class="invitation-card">
-                    <div class="invitation-header">
-                        <span class="event-badge">
-                            <i class="${getEventIcon(evenement.type)} me-2"></i>
-                            ${evenement.type.charAt(0).toUpperCase() + evenement.type.slice(1)}
-                        </span>
-                        <h1>${evenement.nom}</h1>
-                        <p class="lead">Vous invitent à célébrer cet événement</p>
-                    </div>
-                    
-                    <div class="couple-photo" style="background-image: url('${evenement.photo}')"></div>
-                    
-                    <div class="text-center mt-4">
+                
+                <div class="content-section">
+                    <div class="text-center mb-4">
                         <h2 class="h3">Cher(e) ${invite.nom},</h2>
                         <p class="text-muted">Nous serions ravis de vous compter parmi nous</p>
                     </div>
@@ -325,6 +297,13 @@
                         <i class="fas ${invite.confirmation === 'oui' ? 'fa-check-circle' : invite.confirmation === 'refuse' ? 'fa-times-circle' : 'fa-clock'} me-2"></i>
                         ${confirmationTexte}
                     </div>
+                    
+                    ${evenement.messagePersonnalise ? `
+                        <div class="message-personnalise">
+                            <i class="fas fa-quote-left text-gold me-2"></i>
+                            ${evenement.messagePersonnalise}
+                        </div>
+                    ` : ''}
                     
                     <div class="info-grid">
                         <div class="info-item">
@@ -357,13 +336,13 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <div class="boisson-option ${invite.boisson1 ? 'selected' : ''}" onclick="choisirBoisson(1, '${invite.id}')">
+                                <div class="boisson-option ${invite.boisson1 ? 'selected' : ''}" onclick="choisirBoisson(1)">
                                     <i class="fas fa-wine-glass-alt me-2"></i>
                                     <strong>1er choix :</strong> ${invite.boisson1 || 'Non choisi'}
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <div class="boisson-option ${invite.boisson2 ? 'selected' : ''}" onclick="choisirBoisson(2, '${invite.id}')">
+                                <div class="boisson-option ${invite.boisson2 ? 'selected' : ''}" onclick="choisirBoisson(2)">
                                     <i class="fas fa-glass-cheers me-2"></i>
                                     <strong>2ème choix :</strong> ${invite.boisson2 || 'Non choisi'}
                                 </div>
@@ -376,10 +355,10 @@
                         
                         <div class="mt-4">
                             ${invite.confirmation !== 'oui' && invite.confirmation !== 'refuse' ? `
-                                <button class="btn btn-gold" onclick="confirmerPresence('${invite.id}')">
+                                <button class="btn btn-gold" onclick="confirmerPresence()">
                                     <i class="fas fa-check-circle me-2"></i>Confirmer ma présence
                                 </button>
-                                <button class="btn btn-outline-gold" onclick="refuserPresence('${invite.id}')">
+                                <button class="btn btn-outline-gold" onclick="refuserPresence()">
                                     <i class="fas fa-times-circle me-2"></i>Je ne pourrai pas venir
                                 </button>
                             ` : ''}
@@ -399,12 +378,11 @@
                         </div>
                     </div>
                 </div>
-            `;
-            document.getElementById('content').style.display = 'block';
-        }
+            </div>
+        `;
+        document.getElementById('content').style.display = 'block';
         
-        // Fonctions pour les interactions des invités
-        function choisirBoisson(numero, inviteId) {
+        function choisirBoisson(numero) {
             const options = [
                 { value: '', label: 'Aucune préférence' },
                 { value: 'vin', label: 'Vin' },
@@ -431,26 +409,17 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     const choix = document.getElementById('boissonSelect').value;
-                    
-                    // Redirection vers l'admin avec les nouvelles données
-                    const baseUrl = window.location.origin + '/mon-site-mariage/gestion-invites.html';
-                    const message = `L'invité a choisi ${choix || 'aucune boisson'} comme ${numero}er choix.`;
-                    
-                    // On pourrait envoyer un email ou notifier l'admin
                     Swal.fire({
                         title: 'Merci !',
-                        text: `Votre choix a été enregistré. ${choix ? 'Vous avez choisi : ' + choix : ''}`,
+                        text: choix ? `Vous avez choisi : ${options.find(o => o.value === choix)?.label}` : 'Aucune boisson choisie',
                         icon: 'success',
                         confirmButtonColor: '#D4AF37'
-                    }).then(() => {
-                        // Recharger la page pour voir le choix
-                        window.location.reload();
                     });
                 }
             });
         }
         
-        function confirmerPresence(inviteId) {
+        function confirmerPresence() {
             const message = document.getElementById('messageInput')?.value || '';
             
             Swal.fire({
@@ -470,14 +439,13 @@
                         icon: 'success',
                         confirmButtonColor: '#D4AF37'
                     }).then(() => {
-                        // Recharger pour voir le statut mis à jour
                         window.location.reload();
                     });
                 }
             });
         }
         
-        function refuserPresence(inviteId) {
+        function refuserPresence() {
             Swal.fire({
                 title: 'Refuser l\'invitation',
                 text: 'Nous sommes désolés que vous ne puissiez pas venir.',

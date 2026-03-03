@@ -123,6 +123,13 @@
             border-radius: 4px;
         }
         
+        .message-personnalise {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
         @media (max-width: 768px) {
             .container { padding: 10px; }
             .event-image { height: 150px; }
@@ -268,6 +275,12 @@
                                         <p><i class="fas fa-phone me-2 text-gold"></i>${event.telephone}</p>
                                     </div>
                                 </div>
+                                ${event.messagePersonnalise ? `
+                                    <div class="message-personnalise">
+                                        <i class="fas fa-quote-left text-gold me-2"></i>
+                                        ${event.messagePersonnalise}
+                                    </div>
+                                ` : ''}
                                 <div class="d-flex gap-2 mt-3">
                                     <button class="btn btn-sm btn-outline-primary flex-fill" onclick="modifierEvenement(${index})">
                                         <i class="fas fa-edit me-1"></i>Modifier
@@ -312,6 +325,7 @@
                     <textarea id="adresse" class="swal2-textarea" placeholder="Adresse complète"></textarea>
                     <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
                     <input type="email" id="email" class="swal2-input" placeholder="Email">
+                    <textarea id="message" class="swal2-textarea" placeholder="Message personnalisé pour les invités (optionnel)"></textarea>
                     <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
                         <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                         <p>Cliquez pour choisir une photo</p>
@@ -354,6 +368,7 @@
                         adresse: document.getElementById('adresse').value,
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
+                        messagePersonnalise: document.getElementById('message').value,
                         photo: photoBase64 || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
                         archive: false,
                         dateCreation: new Date().toISOString()
@@ -383,6 +398,7 @@
                     <textarea id="adresse" class="swal2-textarea">${event.adresse || ''}</textarea>
                     <input type="tel" id="telephone" class="swal2-input" value="${event.telephone || ''}">
                     <input type="email" id="email" class="swal2-input" value="${event.email || ''}">
+                    <textarea id="message" class="swal2-textarea" placeholder="Message personnalisé">${event.messagePersonnalise || ''}</textarea>
                     <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
                         <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
                         <p>Cliquez pour changer la photo</p>
@@ -418,6 +434,7 @@
                         adresse: document.getElementById('adresse').value,
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
+                        messagePersonnalise: document.getElementById('message').value,
                         photo: photoBase64 || event.photo
                     };
                     sauvegarder();

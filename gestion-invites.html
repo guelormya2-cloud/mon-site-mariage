@@ -76,6 +76,14 @@
             margin-bottom: 20px;
         }
         
+        .short-link {
+            font-size: 0.85rem;
+            background: #f8f9fa;
+            padding: 5px 10px;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        
         @media (max-width: 768px) {
             .container { padding: 10px; }
             .btn-group { flex-direction: column; }
@@ -100,36 +108,32 @@
             afficherInvites();
         }
         
-        function genererLienInvitation(invite) {
-            const baseUrl = window.location.origin + window.location.pathname.replace('gestion-invites.html', 'invitation.html');
+        // Fonction pour générer un ID court (8 caractères)
+        function genererIdCourt() {
+            return Math.random().toString(36).substring(2, 10).toUpperCase();
+        }
+        
+        // Fonction pour créer un lien court
+        function genererLienCourt(invite) {
+            const baseUrl = window.location.origin + window.location.pathname.replace('gestion-invites.html', 'i/');
             
-            // Récupérer l'événement associé
-            const evenement = evenements.find(e => e.id === invite.evenementId) || {};
+            // Créer un ID court si nécessaire
+            if (!invite.shortId) {
+                invite.shortId = genererIdCourt();
+                // Sauvegarder l'ID court
+                const index = invites.findIndex(i => i.id === invite.id);
+                if (index !== -1) {
+                    invites[index].shortId = invite.shortId;
+                    localStorage.setItem('invites', JSON.stringify(invites));
+                }
+            }
             
-            const params = new URLSearchParams({
-                id: invite.id,
-                nom: invite.nom || '',
-                evenementId: invite.evenementId || '',
-                evenementNom: evenement.nom || 'Mariage',
-                evenementType: evenement.type || 'mariage',
-                evenementDate: evenement.date || '',
-                evenementHeure: evenement.heure || '',
-                evenementLieu: evenement.lieu || '',
-                evenementAdresse: evenement.adresse || '',
-                evenementTelephone: evenement.telephone || '',
-                evenementEmail: evenement.email || '',
-                evenementPhoto: evenement.photo || '',
-                tableId: invite.tableId || '',
-                tableNom: tables.find(t => t.id === invite.tableId)?.nom || '',
-                email: invite.email || '',
-                telephone: invite.telephone || '',
-                boisson1: invite.boisson1 || '',
-                boisson2: invite.boisson2 || '',
-                message: invite.message || '',
-                confirmation: invite.confirmation || 'non'
-            }).toString();
-            
-            return `${baseUrl}?${params}`;
+            return `${baseUrl}${invite.shortId}`;
+        }
+        
+        // Récupérer l'événement pour un invité
+        function getEvenementForInvite(invite) {
+            return evenements.find(e => e.id === invite.evenementId) || {};
         }
     </script>
 
@@ -205,7 +209,7 @@
             
             invitesFiltres.forEach((invite) => {
                 const table = tables.find(t => t.id === invite.tableId);
-                const evenement = evenements.find(e => e.id === invite.evenementId);
+                const evenement = getEvenementForInvite(invite);
                 
                 let badgeClass = 'badge-attente';
                 let badgeTexte = 'En attente';
@@ -218,7 +222,7 @@
                     badgeTexte = 'Refusé';
                 }
                 
-                const lien = genererLienInvitation(invite);
+                const lienCourt = genererLienCourt(invite);
                 
                 container.innerHTML += `
                     <div class="guest-card">
@@ -231,7 +235,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><i class="fas fa-calendar me-2 text-gold"></i>${evenement ? evenement.nom : 'Événement?'}</p>
+                                    <p><i class="fas fa-calendar me-2 text-gold"></i>${evenement.nom || 'Événement'}</p>
                                     <p><i class="fas fa-chair me-2 text-gold"></i>${table ? table.nom : 'Non assigné'}</p>
                                     <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || '-'}</p>
                                     <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || '-'}</p>
@@ -241,15 +245,21 @@
                                     <p class="fst-italic">"${invite.message || 'Aucun message'}"</p>
                                 </div>
                             </div>
+                            
+                            <div class="short-link mt-2 mb-2">
+                                <i class="fas fa-link text-gold me-2"></i>
+                                <small>${lienCourt}</small>
+                            </div>
+                            
                             <div class="btn-group w-100 mt-2">
-                                <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp('${encodeURIComponent(lien)}', '${invite.nom}')">
+                                <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp('${lienCourt}', '${invite.nom}')">
                                     <i class="fab fa-whatsapp"></i> WhatsApp
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail('${invite.email}', '${encodeURIComponent(lien)}', '${invite.nom}')">
+                                <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail('${invite.email}', '${lienCourt}', '${invite.nom}')">
                                     <i class="fas fa-envelope"></i> Email
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="copierLien('${lien}')">
-                                    <i class="fas fa-link"></i> Lien
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copierLien('${lienCourt}')">
+                                    <i class="fas fa-link"></i> Copier
                                 </button>
                                 <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${invite.id})">
                                     <i class="fas fa-edit"></i>
@@ -300,6 +310,7 @@
                     
                     invites.push({
                         id: Date.now(),
+                        shortId: genererIdCourt(),
                         nom: nom,
                         evenementId: parseInt(document.getElementById('evenementId').value) || null,
                         tableId: parseInt(document.getElementById('tableId').value) || null,
@@ -403,7 +414,7 @@
         }
         
         function envoyerWhatsApp(lien, nom) {
-            const message = `Bonjour ${nom}, voici votre invitation : ${decodeURIComponent(lien)}`;
+            const message = `Bonjour ${nom}, voici votre invitation : ${lien}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
         }
         
@@ -413,12 +424,12 @@
                 return;
             }
             const sujet = "Votre invitation";
-            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation et confirmer votre présence : ${decodeURIComponent(lien)}`;
+            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation : ${lien}`;
             window.location.href = `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
         }
         
         function copierLien(lien) {
-            navigator.clipboard.writeText(decodeURIComponent(lien)).then(() => {
+            navigator.clipboard.writeText(lien).then(() => {
                 Swal.fire('Copié!', 'Lien copié dans le presse-papier', 'success');
             });
         }
