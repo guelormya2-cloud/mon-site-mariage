@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des tables</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root { --gold: #D4AF37; --dark-gold: #B8860B; }
+        body { background-color: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #000 0%, #2c2c2c 100%); }
+        .navbar-brand { color: var(--gold) !important; font-family: 'Playfair Display', serif; }
+        .nav-link { color: white !important; }
+        .btn-gold { background-color: var(--gold); border-color: var(--gold); color: white; }
+        .btn-gold:hover { background-color: var(--dark-gold); border-color: var(--dark-gold); }
+        .table-card { border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 20px; }
+        .table-header { background-color: var(--gold); color: white; padding: 15px; border-radius: 8px 8px 0 0; }
+    </style>
+</head>
+<body>
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = '1-login.html';
+        
+        let tables = JSON.parse(localStorage.getItem('tables')) || [
+            { id: 1, nom: "VIP", capacite: 10 },
+            { id: 2, nom: "Famille", capacite: 12 },
+            { id: 3, nom: "Amis", capacite: 8 }
+        ];
+        
+        function sauvegarder() {
+            localStorage.setItem('tables', JSON.stringify(tables));
+            afficherTables();
+        }
+    </script>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestion des tables</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="2-dashboard.html">Retour</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <button class="btn btn-gold mb-4" onclick="ajouterTable()">
+            <i class="fas fa-plus me-2"></i>Nouvelle table
+        </button>
+        
+        <div class="row" id="tablesContainer"></div>
+    </div>
+
+    <script>
+        function afficherTables() {
+            const container = document.getElementById('tablesContainer');
+            container.innerHTML = '';
+            
+            tables.forEach((table, index) => {
+                container.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="table-card">
+                            <div class="table-header">
+                                <div class="d-flex justify-content-between">
+                                    <h5>${table.nom}</h5>
+                                    <div>
+                                        <button class="btn btn-sm btn-light me-1" onclick='modifierTable(${index})'>
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick='supprimerTable(${index})'>
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <small>Capacité: ${table.capacite} personnes</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function ajouterTable() {
+            Swal.fire({
+                title: 'Nouvelle table',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" placeholder="Nom de la table">
+                    <input type="number" id="capacite" class="swal2-input" placeholder="Capacité" value="10">
+                `,
+                confirmButtonText: 'Créer',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const nom = document.getElementById('nom').value;
+                    const capacite = document.getElementById('capacite').value;
+                    if (!nom) { Swal.showValidationMessage('Nom requis'); return false; }
+                    tables.push({ id: Date.now(), nom, capacite: parseInt(capacite) });
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function modifierTable(index) {
+            const table = tables[index];
+            Swal.fire({
+                title: 'Modifier la table',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" value="${table.nom}">
+                    <input type="number" id="capacite" class="swal2-input" value="${table.capacite}">
+                `,
+                confirmButtonText: 'Modifier',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                preConfirm: () => {
+                    tables[index].nom = document.getElementById('nom').value;
+                    tables[index].capacite = parseInt(document.getElementById('capacite').value);
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function supprimerTable(index) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: `Supprimer la table ${tables[index].nom} ?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Oui'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    tables.splice(index, 1);
+                    sauvegarder();
+                }
+            });
+        }
+        
+        afficherTables();
+    </script>
+</body>
+</html>
