@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Tableau de Bord - Gestion Mariage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -177,6 +177,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="archives.html">
+                            <i class="fas fa-archive me-1"></i>Archives
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="logout()">
                             <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
                         </a>
@@ -201,7 +206,7 @@
                     <div class="card-body text-center p-4">
                         <i class="fas fa-calendar-alt fa-3x text-gold mb-3"></i>
                         <h4>Événements</h4>
-                        <p class="text-muted small">Gérer les événements et leurs informations</p>
+                        <p class="text-muted small">Créer, modifier, gérer les événements</p>
                     </div>
                 </div>
             </div>
@@ -249,6 +254,16 @@
                                 <p class="text-muted small">Invit</p>
                             </div>
                         </div>
+                        <div class="row text-center mt-3">
+                            <div class="col-6">
+                                <div class="stat-number" id="totalActifs">0</div>
+                                <p class="text-muted small">Événements actifs</p>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-number" id="totalArchives">0</div>
+                                <p class="text-muted small">Archives</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -262,12 +277,18 @@
         function mettreAJourStats() {
             try {
                 const evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+                const aujourdhui = new Date().toISOString().split('T')[0];
+                
+                const actifs = evenements.filter(e => e.date >= aujourdhui && !e.archive);
+                const archives = evenements.filter(e => e.date < aujourdhui || e.archive);
                 const tables = JSON.parse(localStorage.getItem('tables')) || [];
                 const invites = JSON.parse(localStorage.getItem('invites')) || [];
                 
                 document.getElementById('totalEvenements').textContent = evenements.length;
                 document.getElementById('totalTables').textContent = tables.length;
                 document.getElementById('totalInvites').textContent = invites.length;
+                document.getElementById('totalActifs').textContent = actifs.length;
+                document.getElementById('totalArchives').textContent = archives.length;
             } catch (e) {
                 console.log('Erreur de chargement des stats');
             }

@@ -67,17 +67,19 @@
             object-fit: cover;
         }
         
-        .photo-upload {
+        .photo-upload-area {
             border: 2px dashed #ced4da;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
         
-        .photo-upload:hover {
+        .photo-upload-area:hover {
             border-color: var(--gold);
+            background-color: rgba(212, 175, 55, 0.05);
         }
         
         .photo-preview {
@@ -94,6 +96,27 @@
         .info-item label {
             font-weight: 600;
             color: var(--dark-gray);
+        }
+        
+        .badge-actif {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .badge-archive {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .badge-passe {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         @media (max-width: 768px) {
@@ -122,29 +145,20 @@
 
         // Données des événements
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+        let photoBase64 = '';
         
-        // Événement par défaut si aucun n'existe
-        if (evenements.length === 0) {
-            evenements = [
-                {
-                    id: 1,
-                    nom: "Mariage Guelor & Naomie",
-                    date: "2026-03-07",
-                    heure: "19:00",
-                    lieu: "GLORIOUS PALACE",
-                    adresse: "Av. Mvunda 21, Q/yolo-nord, Kinshasa",
-                    telephone: "+243 82 124 8030",
-                    email: "guelormuya2@gmail.com",
-                    photo: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
-                    actif: true
-                }
-            ];
-            localStorage.setItem('evenements', JSON.stringify(evenements));
-        }
-
         function sauvegarder() {
             localStorage.setItem('evenements', JSON.stringify(evenements));
             afficherEvenements();
+        }
+        
+        function convertirImageEnBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
     </script>
 
@@ -174,9 +188,7 @@
         </div>
         
         <!-- Liste des événements -->
-        <div class="row" id="evenementsContainer">
-            <!-- Les événements seront affichés ici -->
-        </div>
+        <div class="row" id="evenementsContainer"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -185,6 +197,8 @@
     <script>
         function afficherEvenements() {
             const container = document.getElementById('evenementsContainer');
+            const aujourdhui = new Date().toISOString().split('T')[0];
+            
             container.innerHTML = '';
             
             if (evenements.length === 0) {
@@ -200,9 +214,25 @@
                 return;
             }
             
+            // Trier par date (du plus récent au plus ancien)
+            evenements.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
             evenements.forEach((event, index) => {
-                const actif = event.actif ? 'Événement actif' : 'Inactif';
-                const badgeClass = event.actif ? 'bg-success' : 'bg-secondary';
+                const dateEvent = new Date(event.date);
+                const aujourdhuiDate = new Date(aujourdhui);
+                const estPasse = dateEvent < aujourdhuiDate;
+                const estArchive = event.archive || estPasse;
+                
+                let badgeClass = 'badge-actif';
+                let badgeTexte = 'Actif';
+                
+                if (estArchive) {
+                    badgeClass = 'badge-archive';
+                    badgeTexte = 'Archivé';
+                } else if (estPasse) {
+                    badgeClass = 'badge-passe';
+                    badgeTexte = 'Passé';
+                }
                 
                 container.innerHTML += `
                     <div class="col-md-6 mb-4">
@@ -210,22 +240,22 @@
                             <div class="event-header">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">${event.nom}</h5>
-                                    <span class="badge ${badgeClass}">${actif}</span>
+                                    <span class="badge ${badgeClass}">${badgeTexte}</span>
                                 </div>
                             </div>
-                            <img src="${event.photo}" class="event-image" alt="${event.nom}" onerror="this.src='https://via.placeholder.com/800x400?text=Photo+non+disponible'">
+                            <img src="${event.photo || 'https://via.placeholder.com/800x400?text=Photo+non+disponible'}" 
+                                 class="event-image" alt="${event.nom}" 
+                                 onerror="this.src='https://via.placeholder.com/800x400?text=Photo+non+disponible'">
                             <div class="card-body">
-                                <div class="info-item">
-                                    <label><i class="fas fa-calendar me-2 text-gold"></i>Date:</label>
-                                    <p>${event.date} à ${event.heure}</p>
-                                </div>
-                                <div class="info-item">
-                                    <label><i class="fas fa-map-marker me-2 text-gold"></i>Lieu:</label>
-                                    <p>${event.lieu}<br><small>${event.adresse}</small></p>
-                                </div>
-                                <div class="info-item">
-                                    <label><i class="fas fa-phone me-2 text-gold"></i>Contact:</label>
-                                    <p>${event.telephone} | ${event.email}</p>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p><i class="fas fa-calendar me-2 text-gold"></i>${event.date}</p>
+                                        <p><i class="fas fa-clock me-2 text-gold"></i>${event.heure}</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <p><i class="fas fa-map-marker me-2 text-gold"></i>${event.lieu}</p>
+                                        <p><i class="fas fa-phone me-2 text-gold"></i>${event.telephone}</p>
+                                    </div>
                                 </div>
                                 <div class="d-flex gap-2 mt-3">
                                     <button class="btn btn-sm btn-outline-primary flex-fill" onclick="modifierEvenement(${index})">
@@ -234,8 +264,17 @@
                                     <button class="btn btn-sm btn-outline-success flex-fill" onclick="dupliquerEvenement(${index})">
                                         <i class="fas fa-copy me-1"></i>Dupliquer
                                     </button>
+                                    ${!estArchive ? `
+                                        <button class="btn btn-sm btn-outline-warning flex-fill" onclick="archiverEvenement(${index})">
+                                            <i class="fas fa-archive me-1"></i>Archiver
+                                        </button>
+                                    ` : `
+                                        <button class="btn btn-sm btn-outline-success flex-fill" onclick="restaurerEvenement(${index})">
+                                            <i class="fas fa-undo me-1"></i>Restaurer
+                                        </button>
+                                    `}
                                     <button class="btn btn-sm btn-outline-danger flex-fill" onclick="supprimerEvenement(${index})">
-                                        <i class="fas fa-trash me-1"></i>Supprimer
+                                        <i class="fas fa-trash me-1"></i>
                                     </button>
                                 </div>
                             </div>
@@ -246,21 +285,44 @@
         }
         
         function ajouterEvenement() {
+            let photoInput = '';
+            
             Swal.fire({
                 title: 'Nouvel événement',
                 html: `
                     <input type="text" id="nom" class="swal2-input" placeholder="Nom de l'événement" value="Nouvel événement">
-                    <input type="date" id="date" class="swal2-input" value="2026-12-31">
+                    <input type="date" id="date" class="swal2-input" value="${new Date().toISOString().split('T')[0]}">
                     <input type="time" id="heure" class="swal2-input" value="19:00">
                     <input type="text" id="lieu" class="swal2-input" placeholder="Lieu">
                     <textarea id="adresse" class="swal2-textarea" placeholder="Adresse complète"></textarea>
                     <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
                     <input type="email" id="email" class="swal2-input" placeholder="Email">
+                    <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
+                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                        <p>Cliquez pour choisir une photo</p>
+                        <input type="file" id="photoFile" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
+                    </div>
+                    <img id="photoPreview" class="photo-preview" style="display: none;">
                 `,
                 confirmButtonText: 'Créer',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
+                didOpen: () => {
+                    // Ajouter l'écouteur d'événement pour le fichier
+                    document.getElementById('photoFile').addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                document.getElementById('photoPreview').src = e.target.result;
+                                document.getElementById('photoPreview').style.display = 'block';
+                                photoBase64 = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                },
                 preConfirm: () => {
                     const nom = document.getElementById('nom').value.trim();
                     if (!nom) {
@@ -277,8 +339,9 @@
                         adresse: document.getElementById('adresse').value,
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
-                        photo: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-                        actif: false
+                        photo: photoBase64 || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                        archive: false,
+                        dateCreation: new Date().toISOString()
                     });
                     sauvegarder();
                 }
@@ -287,6 +350,7 @@
         
         function modifierEvenement(index) {
             const event = evenements[index];
+            photoBase64 = event.photo;
             
             Swal.fire({
                 title: 'Modifier l\'événement',
@@ -298,16 +362,30 @@
                     <textarea id="adresse" class="swal2-textarea">${event.adresse || ''}</textarea>
                     <input type="tel" id="telephone" class="swal2-input" value="${event.telephone || ''}">
                     <input type="email" id="email" class="swal2-input" value="${event.email || ''}">
-                    <input type="url" id="photo" class="swal2-input" value="${event.photo}" placeholder="URL de la photo">
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" type="checkbox" id="actif" ${event.actif ? 'checked' : ''}>
-                        <label class="form-check-label">Événement actif</label>
+                    <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
+                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                        <p>Cliquez pour changer la photo</p>
+                        <input type="file" id="photoFile" accept="image/*" style="display: none;" onchange="previewPhoto(event)">
                     </div>
+                    <img id="photoPreview" class="photo-preview" src="${event.photo}" style="display: block;">
                 `,
                 confirmButtonText: 'Modifier',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
+                didOpen: () => {
+                    document.getElementById('photoFile').addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                document.getElementById('photoPreview').src = e.target.result;
+                                photoBase64 = e.target.result;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                },
                 preConfirm: () => {
                     evenements[index] = {
                         ...event,
@@ -318,12 +396,24 @@
                         adresse: document.getElementById('adresse').value,
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
-                        photo: document.getElementById('photo').value,
-                        actif: document.getElementById('actif').checked
+                        photo: photoBase64 || event.photo
                     };
                     sauvegarder();
                 }
             });
+        }
+        
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').src = e.target.result;
+                    document.getElementById('photoPreview').style.display = 'block';
+                    photoBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         }
         
         function dupliquerEvenement(index) {
@@ -332,23 +422,56 @@
                 ...event,
                 id: Date.now(),
                 nom: event.nom + ' (copie)',
-                actif: false
+                archive: false,
+                dateCreation: new Date().toISOString()
             };
             evenements.push(nouveauEvent);
             sauvegarder();
             Swal.fire('Succès', 'Événement dupliqué', 'success');
         }
         
+        function archiverEvenement(index) {
+            Swal.fire({
+                title: 'Archiver',
+                text: `Archiver l'événement ${evenements[index].nom} ?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                confirmButtonText: 'Oui, archiver'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    evenements[index].archive = true;
+                    sauvegarder();
+                    Swal.fire('Archivé!', 'Événement archivé', 'success');
+                }
+            });
+        }
+        
+        function restaurerEvenement(index) {
+            Swal.fire({
+                title: 'Restaurer',
+                text: `Restaurer l'événement ${evenements[index].nom} ?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'Oui, restaurer'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    evenements[index].archive = false;
+                    sauvegarder();
+                    Swal.fire('Restauré!', 'Événement restauré', 'success');
+                }
+            });
+        }
+        
         function supprimerEvenement(index) {
             Swal.fire({
                 title: 'Confirmation',
-                text: `Supprimer l'événement ${evenements[index].nom} ?`,
+                text: `Supprimer définitivement ${evenements[index].nom} ?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Oui, supprimer',
-                cancelButtonText: 'Annuler'
+                confirmButtonText: 'Oui, supprimer'
             }).then((result) => {
                 if (result.isConfirmed) {
                     evenements.splice(index, 1);

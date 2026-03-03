@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Archives des événements</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #000 0%, #2c2c2c 100%);
+            margin-bottom: 20px;
+        }
+        
+        .navbar-brand {
+            color: var(--gold) !important;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .archive-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: white;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .archive-card:hover {
+            opacity: 1;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .archive-header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .archive-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .badge-archive {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .stats-mini {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+        let invites = JSON.parse(localStorage.getItem('invites')) || [];
+        
+        function restaurerEvenement(id) {
+            const index = evenements.findIndex(e => e.id === id);
+            if (index !== -1) {
+                evenements[index].archive = false;
+                localStorage.setItem('evenements', JSON.stringify(evenements));
+                afficherArchives();
+                Swal.fire('Restauré!', 'Événement restauré', 'success');
+            }
+        }
+        
+        function supprimerDefinitivement(id) {
+            Swal.fire({
+                title: 'Suppression définitive',
+                text: 'Cette action est irréversible. Les invités liés seront aussi supprimés.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Oui, tout supprimer'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Supprimer l'événement
+                    evenements = evenements.filter(e => e.id !== id);
+                    // Supprimer les invités liés
+                    invites = invites.filter(i => i.evenementId !== id);
+                    
+                    localStorage.setItem('evenements', JSON.stringify(evenements));
+                    localStorage.setItem('invites', JSON.stringify(invites));
+                    afficherArchives();
+                    Swal.fire('Supprimé!', 'Événement et invités supprimés', 'success');
+                }
+            });
+        }
+    </script>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Archives des événements</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row" id="archivesContainer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        function afficherArchives() {
+            const container = document.getElementById('archivesContainer');
+            const aujourdhui = new Date().toISOString().split('T')[0];
+            
+            // Filtrer les événements archivés ou passés
+            const archives = evenements.filter(e => {
+                const dateEvent = new Date(e.date);
+                const aujourdhuiDate = new Date(aujourdhui);
+                return e.archive || dateEvent < aujourdhuiDate;
+            });
+            
+            if (archives.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-archive fa-4x text-muted mb-3"></i>
+                            <h5>Aucun événement archivé</h5>
+                            <p>Les événements passés apparaîtront ici automatiquement</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Trier par date (du plus récent au plus ancien)
+            archives.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            archives.forEach(event => {
+                const invitesCount = invites.filter(i => i.evenementId === event.id).length;
+                const confirmesCount = invites.filter(i => i.evenementId === event.id && i.confirmation === 'oui').length;
+                
+                container.innerHTML += `
+                    <div class="col-md-6 mb-4">
+                        <div class="archive-card">
+                            <div class="archive-header">
+                                <h5 class="mb-0">${event.nom}</h5>
+                            </div>
+                            <img src="${event.photo || 'https://via.placeholder.com/800x400'}" class="archive-image" alt="${event.nom}">
+                            <div class="card-body">
+                                <p><i class="fas fa-calendar me-2"></i>${event.date} à ${event.heure}</p>
+                                <p><i class="fas fa-map-marker me-2"></i>${event.lieu}</p>
+                                <div class="stats-mini mb-3">
+                                    <span class="me-3"><i class="fas fa-users"></i> ${invitesCount} invités</span>
+                                    <span><i class="fas fa-check-circle text-success"></i> ${confirmesCount} confirmés</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-outline-success flex-fill" onclick="restaurerEvenement(${event.id})">
+                                        <i class="fas fa-undo me-1"></i>Restaurer
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="supprimerDefinitivement(${event.id})">
+                                        <i class="fas fa-trash me-1"></i>Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        afficherArchives();
+    </script>
+</body>
+</html>

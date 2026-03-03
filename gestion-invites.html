@@ -74,6 +74,13 @@
             gap: 5px;
         }
         
+        .filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -128,32 +135,36 @@
     </nav>
 
     <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col-md-3 mb-2">
-                <select class="form-select" id="filtreEvenement" onchange="afficherInvites()">
-                    <option value="">Tous les événements</option>
-                </select>
-            </div>
-            <div class="col-md-3 mb-2">
-                <select class="form-select" id="filtreTable" onchange="afficherInvites()">
-                    <option value="">Toutes les tables</option>
-                </select>
-            </div>
-            <div class="col-md-3 mb-2">
-                <select class="form-select" id="filtreConfirmation" onchange="afficherInvites()">
-                    <option value="">Tous les statuts</option>
-                    <option value="oui">Confirmés</option>
-                    <option value="non">En attente</option>
-                    <option value="refuse">Refusés</option>
-                </select>
-            </div>
-            <div class="col-md-3 mb-2">
-                <button class="btn btn-gold w-100" onclick="ajouterInvite()">
-                    <i class="fas fa-plus me-2"></i>Nouvel invité
-                </button>
+        <!-- Filtres -->
+        <div class="filters">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select class="form-select" id="filtreEvenement" onchange="afficherInvites()">
+                        <option value="">Tous les événements</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtreTable" onchange="afficherInvites()">
+                        <option value="">Toutes les tables</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtreConfirmation" onchange="afficherInvites()">
+                        <option value="">Tous les statuts</option>
+                        <option value="oui">Confirmés</option>
+                        <option value="non">En attente</option>
+                        <option value="refuse">Refusés</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-gold w-100" onclick="ajouterInvite()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
+        <!-- Liste des invités -->
         <div id="invitesContainer"></div>
     </div>
 
@@ -188,7 +199,6 @@
                     <div class="text-center py-5">
                         <i class="fas fa-users fa-4x text-muted mb-3"></i>
                         <h5>Aucun invité trouvé</h5>
-                        <p>Cliquez sur "Nouvel invité" pour commencer</p>
                     </div>
                 `;
                 return;
@@ -214,48 +224,43 @@
                     <div class="guest-card">
                         <div class="guest-header">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>${invite.nom}</h5>
+                                <h5 class="mb-0">${invite.nom}</h5>
                                 <span class="badge ${badgeClass}">${badgeTexte}</span>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><i class="fas fa-calendar me-2 text-gold"></i>Événement: <strong>${evenement ? evenement.nom : 'Non assigné'}</strong></p>
-                                    <p><i class="fas fa-chair me-2 text-gold"></i>Table: <strong>${table ? table.nom : 'Non assigné'}</strong></p>
-                                    <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || 'Non renseigné'}</p>
-                                    <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || 'Non renseigné'}</p>
+                                    <p><i class="fas fa-calendar me-2 text-gold"></i>${evenement ? evenement.nom : 'Événement?'}</p>
+                                    <p><i class="fas fa-chair me-2 text-gold"></i>${table ? table.nom : 'Non assigné'}</p>
+                                    <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || '-'}</p>
+                                    <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || '-'}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><i class="fas fa-glass-cheers me-2 text-gold"></i>Boissons:</p>
+                                    <p><strong>Boissons:</strong></p>
                                     <ul>
-                                        <li>1er choix: ${invite.boisson1 || 'Non choisi'}</li>
-                                        <li>2ème choix: ${invite.boisson2 || 'Non choisi'}</li>
+                                        <li>1: ${invite.boisson1 || '-'}</li>
+                                        <li>2: ${invite.boisson2 || '-'}</li>
                                     </ul>
-                                    <p><i class="fas fa-book me-2 text-gold"></i>Message:</p>
                                     <p class="fst-italic">"${invite.message || 'Aucun message'}"</p>
                                 </div>
                             </div>
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div class="btn-group w-100">
-                                        <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
-                                            <i class="fab fa-whatsapp"></i> WhatsApp
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
-                                            <i class="fas fa-envelope"></i> Email
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary" onclick="copierLien(${originalIndex})">
-                                            <i class="fas fa-link"></i> Lien
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${originalIndex})">
-                                            <i class="fas fa-edit"></i> Modifier
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="btn-group w-100 mt-2">
+                                <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copierLien(${originalIndex})">
+                                    <i class="fas fa-link"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${originalIndex})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -264,11 +269,15 @@
         }
         
         function ajouterInvite() {
-            let evenementOptions = '<option value="">Sélectionner un événement</option>';
-            let tableOptions = '<option value="">Sélectionner une table</option>';
+            let evenementOptions = '<option value="">Choisir un événement</option>';
+            let tableOptions = '<option value="">Choisir une table</option>';
             
-            evenements.forEach(e => {
-                evenementOptions += `<option value="${e.id}">${e.nom}</option>`;
+            // Filtrer les événements non archivés et futurs
+            const aujourdhui = new Date().toISOString().split('T')[0];
+            const evenementsActifs = evenements.filter(e => !e.archive && e.date >= aujourdhui);
+            
+            evenementsActifs.forEach(e => {
+                evenementOptions += `<option value="${e.id}">${e.nom} (${e.date})</option>`;
             });
             
             tables.forEach(t => {
@@ -287,11 +296,10 @@
                 confirmButtonText: 'Créer',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
-                cancelButtonText: 'Annuler',
                 preConfirm: () => {
                     const nom = document.getElementById('nom').value.trim();
                     if (!nom) {
-                        Swal.showValidationMessage('Le nom est requis');
+                        Swal.showValidationMessage('Nom requis');
                         return false;
                     }
                     
@@ -315,8 +323,8 @@
         function modifierInvite(index) {
             const invite = invites[index];
             
-            let evenementOptions = '<option value="">Sélectionner un événement</option>';
-            let tableOptions = '<option value="">Sélectionner une table</option>';
+            let evenementOptions = '<option value="">Choisir un événement</option>';
+            let tableOptions = '<option value="">Choisir une table</option>';
             
             evenements.forEach(e => {
                 const selected = e.id === invite.evenementId ? 'selected' : '';
@@ -342,7 +350,7 @@
                         <option value="refuse" ${invite.confirmation === 'refuse' ? 'selected' : ''}>Refusé</option>
                     </select>
                     <select id="boisson1" class="swal2-input">
-                        <option value="">1er choix boisson (optionnel)</option>
+                        <option value="">Boisson 1 (optionnel)</option>
                         <option value="vin" ${invite.boisson1 === 'vin' ? 'selected' : ''}>Vin</option>
                         <option value="biere" ${invite.boisson1 === 'biere' ? 'selected' : ''}>Bière</option>
                         <option value="champagne" ${invite.boisson1 === 'champagne' ? 'selected' : ''}>Champagne</option>
@@ -351,7 +359,7 @@
                         <option value="soda" ${invite.boisson1 === 'soda' ? 'selected' : ''}>Soda</option>
                     </select>
                     <select id="boisson2" class="swal2-input">
-                        <option value="">2ème choix boisson (optionnel)</option>
+                        <option value="">Boisson 2 (optionnel)</option>
                         <option value="vin" ${invite.boisson2 === 'vin' ? 'selected' : ''}>Vin</option>
                         <option value="biere" ${invite.boisson2 === 'biere' ? 'selected' : ''}>Bière</option>
                         <option value="champagne" ${invite.boisson2 === 'champagne' ? 'selected' : ''}>Champagne</option>
@@ -359,12 +367,11 @@
                         <option value="eau" ${invite.boisson2 === 'eau' ? 'selected' : ''}>Eau</option>
                         <option value="soda" ${invite.boisson2 === 'soda' ? 'selected' : ''}>Soda</option>
                     </select>
-                    <textarea id="message" class="swal2-textarea" placeholder="Message livre d'or">${invite.message || ''}</textarea>
+                    <textarea id="message" class="swal2-textarea" placeholder="Message">${invite.message || ''}</textarea>
                 `,
                 confirmButtonText: 'Modifier',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
-                cancelButtonText: 'Annuler',
                 preConfirm: () => {
                     invites[index] = {
                         ...invite,
@@ -390,14 +397,11 @@
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Oui',
-                cancelButtonText: 'Annuler'
+                confirmButtonText: 'Oui'
             }).then((result) => {
                 if (result.isConfirmed) {
                     invites.splice(index, 1);
                     sauvegarder();
-                    Swal.fire('Supprimé!', 'Invité supprimé', 'success');
                 }
             });
         }
@@ -405,18 +409,18 @@
         function envoyerWhatsApp(index) {
             const invite = invites[index];
             const lien = genererLienInvitation(invite.id);
-            const message = `Bonjour ${invite.nom},\n\nVous êtes invité(e) au mariage. Cliquez sur ce lien :\n${lien}`;
+            const message = `Bonjour ${invite.nom}, voici votre invitation : ${lien}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
         }
         
         function envoyerEmail(index) {
             const invite = invites[index];
             if (!invite.email) {
-                Swal.fire('Erreur', 'Aucune adresse email', 'error');
+                Swal.fire('Erreur', 'Email manquant', 'error');
                 return;
             }
             const lien = genererLienInvitation(invite.id);
-            const sujet = "Invitation à notre mariage";
+            const sujet = "Invitation à notre événement";
             const corps = `Bonjour ${invite.nom},\n\nVoici votre invitation : ${lien}`;
             window.location.href = `mailto:${invite.email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
         }
@@ -429,7 +433,7 @@
             });
         }
         
-        // Remplir les filtres
+        // Initialisation des filtres
         const filtreEvenement = document.getElementById('filtreEvenement');
         const filtreTable = document.getElementById('filtreTable');
         
