@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des invités - Mariage Guelor & Naomie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #000 0%, #2c2c2c 100%);
+            margin-bottom: 20px;
+        }
+        
+        .navbar-brand {
+            color: var(--gold) !important;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+        }
+        
+        .guest-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .guest-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .guest-header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .guest-header h5 {
+            margin: 0;
+            color: white;
+        }
+        
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: normal;
+        }
+        
+        .badge-confirme {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .badge-attente {
+            background-color: #ffc107;
+            color: black;
+        }
+        
+        .badge-refuse {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-group {
+            gap: 5px;
+        }
+        
+        .btn-group .btn {
+            flex: 1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--gold);
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Vérification de connexion
+        (function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        // Données
+        let invites = JSON.parse(localStorage.getItem('invites')) || [];
+        let tables = JSON.parse(localStorage.getItem('tables')) || [];
+        
+        function sauvegarder() {
+            localStorage.setItem('invites', JSON.stringify(invites));
+            afficherInvites();
+        }
+        
+        function genererLienInvitation(id) {
+            return `https://guelormya2-cloud.github.io/mon-site-mariage/invitation.html?id=${id}`;
+        }
+    </script>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestion des invités</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Filtres -->
+        <div class="filters">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <select class="form-select" id="filtreTable" onchange="afficherInvites()">
+                        <option value="">Toutes les tables</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <select class="form-select" id="filtreConfirmation" onchange="afficherInvites()">
+                        <option value="">Tous les statuts</option>
+                        <option value="oui">Confirmés</option>
+                        <option value="non">En attente</option>
+                        <option value="refuse">Refusés</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <button class="btn btn-gold w-100" onclick="ajouterInvite()">
+                        <i class="fas fa-plus me-2"></i>Nouvel invité
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des invités -->
+        <div id="invitesContainer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        function afficherInvites() {
+            const container = document.getElementById('invitesContainer');
+            const filtreTable = document.getElementById('filtreTable').value;
+            const filtreConfirmation = document.getElementById('filtreConfirmation').value;
+            
+            let invitesFiltres = invites;
+            
+            if (filtreTable) {
+                invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
+            }
+            
+            if (filtreConfirmation) {
+                invitesFiltres = invitesFiltres.filter(i => i.confirmation === filtreConfirmation);
+            }
+            
+            container.innerHTML = '';
+            
+            if (invitesFiltres.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h5>Aucun invité trouvé</h5>
+                        <p>Cliquez sur "Nouvel invité" pour commencer</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            invitesFiltres.forEach((invite, index) => {
+                // Trouver l'index réel dans le tableau original
+                const originalIndex = invites.findIndex(i => i.id === invite.id);
+                const table = tables.find(t => t.id === invite.tableId);
+                
+                let badgeClass = 'badge-attente';
+                let badgeTexte = 'En attente';
+                
+                if (invite.confirmation === 'oui') {
+                    badgeClass = 'badge-confirme';
+                    badgeTexte = 'Confirmé';
+                } else if (invite.confirmation === 'refuse') {
+                    badgeClass = 'badge-refuse';
+                    badgeTexte = 'Refusé';
+                }
+                
+                container.innerHTML += `
+                    <div class="guest-card">
+                        <div class="guest-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>${invite.nom}</h5>
+                                <span class="badge ${badgeClass}">${badgeTexte}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><i class="fas fa-chair me-2 text-gold"></i>Table: <strong>${table ? table.nom : 'Non assigné'}</strong></p>
+                                    <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || 'Non renseigné'}</p>
+                                    <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || 'Non renseigné'}</p>
+                                    <p><i class="fas fa-glass-cheers me-2 text-gold"></i>Boisson: ${invite.boisson || 'Non choisi'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong><i class="fas fa-book me-2 text-gold"></i>Livre d'or:</strong></p>
+                                    <p class="text-muted fst-italic border-start border-3 border-gold ps-3">"${invite.message || 'Aucun message'}"</p>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="btn-group w-100">
+                                        <button class="btn btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
+                                            <i class="fab fa-whatsapp"></i> WhatsApp
+                                        </button>
+                                        <button class="btn btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
+                                            <i class="fas fa-envelope"></i> Email
+                                        </button>
+                                        <button class="btn btn-outline-secondary" onclick="copierLien(${originalIndex})">
+                                            <i class="fas fa-link"></i> Lien
+                                        </button>
+                                        <button class="btn btn-outline-warning" onclick="modifierInvite(${originalIndex})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function ajouterInvite() {
+            let tableOptions = '<option value="">Sélectionner une table</option>';
+            tables.forEach(t => {
+                tableOptions += `<option value="${t.id}">${t.nom}</option>`;
+            });
+            
+            Swal.fire({
+                title: 'Nouvel invité',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" placeholder="Nom complet" required>
+                    <input type="email" id="email" class="swal2-input" placeholder="Email">
+                    <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
+                `,
+                confirmButtonText: 'Créer',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                cancelButtonText: 'Annuler',
+                preConfirm: () => {
+                    const nom = document.getElementById('nom').value.trim();
+                    if (!nom) {
+                        Swal.showValidationMessage('Le nom est requis');
+                        return false;
+                    }
+                    
+                    invites.push({
+                        id: Date.now(),
+                        nom: nom,
+                        email: document.getElementById('email').value,
+                        telephone: document.getElementById('telephone').value,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
+                        confirmation: 'non',
+                        boisson: '',
+                        message: '',
+                        repas: ''
+                    });
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function modifierInvite(index) {
+            const invite = invites[index];
+            
+            let tableOptions = '<option value="">Sélectionner une table</option>';
+            tables.forEach(t => {
+                const selected = t.id === invite.tableId ? 'selected' : '';
+                tableOptions += `<option value="${t.id}" ${selected}>${t.nom}</option>`;
+            });
+            
+            Swal.fire({
+                title: 'Modifier invité',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" value="${invite.nom}">
+                    <input type="email" id="email" class="swal2-input" value="${invite.email || ''}">
+                    <input type="tel" id="telephone" class="swal2-input" value="${invite.telephone || ''}">
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
+                    <select id="confirmation" class="swal2-input">
+                        <option value="non" ${invite.confirmation === 'non' ? 'selected' : ''}>En attente</option>
+                        <option value="oui" ${invite.confirmation === 'oui' ? 'selected' : ''}>Confirmé</option>
+                        <option value="refuse" ${invite.confirmation === 'refuse' ? 'selected' : ''}>Refusé</option>
+                    </select>
+                    <select id="boisson" class="swal2-input">
+                        <option value="">Choisir boisson</option>
+                        <option value="vin" ${invite.boisson === 'vin' ? 'selected' : ''}>Vin</option>
+                        <option value="biere" ${invite.boisson === 'biere' ? 'selected' : ''}>Bière</option>
+                        <option value="jus" ${invite.boisson === 'jus' ? 'selected' : ''}>Jus</option>
+                        <option value="eau" ${invite.boisson === 'eau' ? 'selected' : ''}>Eau</option>
+                        <option value="champagne" ${invite.boisson === 'champagne' ? 'selected' : ''}>Champagne</option>
+                    </select>
+                    <textarea id="message" class="swal2-textarea" placeholder="Message livre d'or">${invite.message || ''}</textarea>
+                `,
+                confirmButtonText: 'Modifier',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                cancelButtonText: 'Annuler',
+                preConfirm: () => {
+                    invites[index] = {
+                        ...invite,
+                        nom: document.getElementById('nom').value.trim(),
+                        email: document.getElementById('email').value,
+                        telephone: document.getElementById('telephone').value,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
+                        confirmation: document.getElementById('confirmation').value,
+                        boisson: document.getElementById('boisson').value,
+                        message: document.getElementById('message').value
+                    };
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function supprimerInvite(index) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: 'Supprimer cet invité ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    invites.splice(index, 1);
+                    sauvegarder();
+                    Swal.fire('Supprimé!', 'Invité supprimé avec succès', 'success');
+                }
+            });
+        }
+        
+        function envoyerWhatsApp(index) {
+            const invite = invites[index];
+            const lien = genererLienInvitation(invite.id);
+            const message = `Bonjour ${invite.nom},\n\nVous êtes invité(e) au mariage de Guelor & Naomie le 07/03/2026.\n\nCliquez sur ce lien pour confirmer votre présence :\n${lien}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+        
+        function envoyerEmail(index) {
+            const invite = invites[index];
+            if (!invite.email) {
+                Swal.fire('Erreur', 'Aucune adresse email renseignée', 'error');
+                return;
+            }
+            const lien = genererLienInvitation(invite.id);
+            const sujet = "Invitation au mariage de Guelor & Naomie";
+            const corps = `Bonjour ${invite.nom},\n\nNous avons le plaisir de vous inviter à notre mariage qui aura lieu le 07/03/2026.\n\nCliquez sur ce lien pour confirmer votre présence et laisser un message :\n${lien}\n\nAu plaisir de vous voir,\nGuelor & Naomie`;
+            window.location.href = `mailto:${invite.email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+        }
+        
+        function copierLien(index) {
+            const invite = invites[index];
+            const lien = genererLienInvitation(invite.id);
+            navigator.clipboard.writeText(lien).then(() => {
+                Swal.fire('Copié!', 'Lien copié dans le presse-papier', 'success');
+            }).catch(() => {
+                Swal.fire('Erreur', 'Impossible de copier le lien', 'error');
+            });
+        }
+        
+        // Remplir le filtre des tables
+        const filtreTable = document.getElementById('filtreTable');
+        tables.forEach(t => {
+            filtreTable.innerHTML += `<option value="${t.id}">${t.nom}</option>`;
+        });
+        
+        // Initialisation
+        afficherInvites();
+    </script>
+</body>
+</html>
