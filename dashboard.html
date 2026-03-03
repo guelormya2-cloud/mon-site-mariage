@@ -1,459 +1,232 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de Bord - Mariage</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --dark-gold: #B8860B;
-            --black: #000000;
-            --dark-gray: #2c2c2c;
-            --light-beige: #f8f5f0;
-            --white: #ffffff;
-        }
-        
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #f8f9fa;
-            color: var(--dark-gray);
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            color: var(--black);
-        }
-        
-        .text-gold { color: var(--gold) !important; }
-        .bg-gold { background-color: var(--gold) !important; }
-        
-        .navbar {
-            background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
-        }
-        
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            color: var(--gold) !important;
-        }
-        
-        .event-header {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-        }
-        
-        .nav-tabs .nav-link {
-            color: var(--dark-gray);
-            font-weight: 500;
-            border: none;
-            padding: 1rem 1.5rem;
-        }
-        
-        .nav-tabs .nav-link.active {
-            background-color: transparent;
-            color: var(--gold);
-            border-bottom: 3px solid var(--gold);
-        }
-        
-        .stat-card {
-            border: none;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-            height: 100%;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .badge-confirmed {
-            background-color: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        
-        .badge-pending {
-            background-color: #ffc107;
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        
-        .table-card {
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .table-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 768px) {
-            .nav-tabs .nav-link {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .event-header {
-                padding: 2rem 0;
-            }
-            
-            .display-4 {
-                font-size: 2rem;
-            }
-        }
-        
-        .btn-gold {
-            background-color: var(--gold);
-            border-color: var(--gold);
-            color: white;
-        }
-        
-        .btn-gold:hover {
-            background-color: var(--dark-gold);
-            border-color: var(--dark-gold);
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <script>
-        // Vérification de session
-        (function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            
-            if (!isLoggedIn) {
-                const path = window.location.pathname;
-                const basePath = path.substring(0, path.lastIndexOf('/') + 1);
-                window.location.href = basePath + 'login.html';
-            }
-        })();
-        
-        function logout() {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Déconnexion',
-                    text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#D4AF37',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Oui',
-                    cancelButtonText: 'Non'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userEmail');
-                        const path = window.location.pathname;
-                        const basePath = path.substring(0, path.lastIndexOf('/') + 1);
-                        window.location.href = basePath + 'login.html';
-                    }
-                });
-            } else {
-                // Fallback si SweetAlert n'est pas chargé
-                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('userEmail');
-                    const path = window.location.pathname;
-                    const basePath = path.substring(0, path.lastIndexOf('/') + 1);
-                    window.location.href = basePath + 'login.html';
-                }
-            }
-        }
-    </script>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">Mariage Guelor & Naomie</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Tableau de bord</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i>Paramètres</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-                            <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- En-tête de l'événement -->
-    <div class="event-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-4 text-gold">Mariage de Guelor et Naomie</h1>
-                    <p class="lead">07/03/2026 • salle de fête GLORIOUS PALACE</p>
+<!-- Onglet Plans de table -->
+<div class="tab-pane fade" id="tables" role="tabpanel">
+    <h4 class="mb-4">Plans de Table - Mariage Guelor & Naomie</h4>
+    
+    <div class="row">
+        <!-- TABLE MOUTARDE -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE MOUTARDE</h5>
                 </div>
-                <div class="col-md-4 text-md-end">
-                    <div class="bg-gold text-dark d-inline-block px-3 py-2 rounded">
-                        <small>Code événement:</small>
-                        <div class="h5 mb-0">EVT-EOMHSGHU</div>
-                    </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. TSHISENGE</li>
+                        <li class="list-group-item">2. Dieudonné</li>
+                        <li class="list-group-item">3. Mathieu</li>
+                        <li class="list-group-item">4. Acoustique</li>
+                        <li class="list-group-item">5. Cedric</li>
+                        <li class="list-group-item">6. LUBUIMI</li>
+                        <li class="list-group-item">7. Fidèle</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>7 invitations · 11 places</strong>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="container mb-5">
-        <!-- Navigation par onglets -->
-        <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard">
-                    <i class="fas fa-chart-pie me-2"></i>Tableau de bord
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="guests-tab" data-bs-toggle="tab" data-bs-target="#guests">
-                    <i class="fas fa-users me-2"></i>Invitations
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables">
-                    <i class="fas fa-chair me-2"></i>Plans de table
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" id="guestbook-tab" data-bs-toggle="tab" data-bs-target="#guestbook">
-                    <i class="fas fa-book me-2"></i>Livre d'or
-                </button>
-            </li>
-        </ul>
-
-        <!-- Contenu des onglets -->
-        <div class="tab-content">
-            <!-- Onglet Tableau de bord -->
-            <div class="tab-pane fade show active" id="dashboard">
-                <div class="row mb-4">
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="card stat-card shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="text-gold mb-2">
-                                    <i class="fas fa-envelope fa-2x"></i>
-                                </div>
-                                <div class="stat-number">118</div>
-                                <p class="card-text">Invitations émises</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="card stat-card shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="text-success mb-2">
-                                    <i class="fas fa-check-circle fa-2x"></i>
-                                </div>
-                                <div class="stat-number">6</div>
-                                <p class="card-text">Confirmées</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="card stat-card shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="text-warning mb-2">
-                                    <i class="fas fa-clock fa-2x"></i>
-                                </div>
-                                <div class="stat-number">112</div>
-                                <p class="card-text">En attente</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-3 col-6 mb-3">
-                        <div class="card stat-card shadow-sm">
-                            <div class="card-body text-center">
-                                <div class="text-info mb-2">
-                                    <i class="fas fa-book fa-2x"></i>
-                                </div>
-                                <div class="stat-number">8</div>
-                                <p class="card-text">Messages</p>
-                            </div>
-                        </div>
-                    </div>
+        
+        <!-- TABLE LA TEAM -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE LA TEAM</h5>
                 </div>
-
-                <div class="row">
-                    <div class="col-lg-8 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="mb-0">Détails de l'événement</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Date:</strong> 07/03/2026</p>
-                                        <p><strong>Heure:</strong> 19:00 - 04:00</p>
-                                        <p><strong>Lieu:</strong> GLORIOUS PALACE</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Organisé par:</strong> Guelor & Naomie</p>
-                                        <p><strong>Contact:</strong> contact@mariage.com</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4 mb-4">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white">
-                                <h5 class="mb-0">Image</h5>
-                            </div>
-                            <div class="card-body text-center">
-                                <img src="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" 
-                                     alt="Mariage" class="img-fluid rounded">
-                            </div>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">NKENKA</li>
+                        <li class="list-group-item">HATSHIDI</li>
+                        <li class="list-group-item">MBUMBA</li>
+                        <li class="list-group-item">MUAMBA</li>
+                        <li class="list-group-item">Dominique</li>
+                        <li class="list-group-item">KALU</li>
+                        <li class="list-group-item">Donald BIYENGE</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>7 invitations · 10 places</strong>
                 </div>
             </div>
-
-            <!-- Onglet Invitations -->
-            <div class="tab-pane fade" id="guests">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Liste des invités</h4>
-                        <p class="text-muted">118 invitations / 183 personnes</p>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Statut</th>
-                                    <th>Table</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Couple Marie & MISENGA</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>MAYONNAISE</td>
-                                </tr>
-                                <tr>
-                                    <td>Mme MA BLANDINE</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>MAYONNAISE</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr FAMILLE</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>FRES</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple Pierre</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>FAST</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple Cple Mathieu</td>
-                                    <td><span class="badge-confirmed">Confirmée</span></td>
-                                    <td>MUTARDE</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        </div>
+        
+        <!-- TABLE AQUALIS -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE AQUALIS</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Mr Rémi</li>
+                        <li class="list-group-item">2. Mr Marc</li>
+                        <li class="list-group-item">3. Mr Pascal</li>
+                        <li class="list-group-item">4. Mr Lionnel</li>
+                        <li class="list-group-item">5. Andy</li>
+                        <li class="list-group-item">6. Jean Marie NDA</li>
+                        <li class="list-group-item">7. Dady</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>7 invitations · 10 places</strong>
                 </div>
             </div>
-
-            <!-- Onglet Tables -->
-            <div class="tab-pane fade" id="tables">
-                <h4 class="mb-4">Plans de table</h4>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table MAYONNAISE</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>7/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table VIP</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>16/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table SPRING</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>20/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
+        </div>
+        
+        <!-- TABLE SPRING -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE SPRING</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. LEMA</li>
+                        <li class="list-group-item">2. MUDIMBI</li>
+                        <li class="list-group-item">3. BAKULU</li>
+                        <li class="list-group-item">4. BINTU</li>
+                        <li class="list-group-item">5. KABAMBA</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>5 invitations · 8 places</strong>
                 </div>
             </div>
-
-            <!-- Onglet Livre d'or -->
-            <div class="tab-pane fade" id="guestbook">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Livre d'or</h4>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Invité</th>
-                                    <th>Message</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Couple Andy</td>
-                                    <td>"Heureux mariage"</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr MUTOMBO</td>
-                                    <td>"Félicitations à vous deux !"</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple KABAMBA</td>
-                                    <td>"Que Dieu vous bénisse"</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr MANGALA</td>
-                                    <td>"Bonne fête de mariage"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+        </div>
+        
+        <!-- TABLE VIP -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE VIP</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Robert</li>
+                        <li class="list-group-item">2. BUASSA</li>
+                        <li class="list-group-item">3. Eddy</li>
+                        <li class="list-group-item">4. MANGALA</li>
+                        <li class="list-group-item">5. MUTOMBO</li>
+                        <li class="list-group-item">6. SPARCK</li>
+                        <li class="list-group-item">7. MAKINA</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>7 invitations · 10 places</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE TARTINE -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE TARTINE</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. KWETE</li>
+                        <li class="list-group-item">2. BEA MPANGA</li>
+                        <li class="list-group-item">3. Rose</li>
+                        <li class="list-group-item">4. OBONGA</li>
+                        <li class="list-group-item">5. Arsène</li>
+                        <li class="list-group-item">6. Tacite</li>
+                        <li class="list-group-item">7. Dorcas</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>7 invitations · 10 places</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE FRES -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE FRES</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Carmen</li>
+                        <li class="list-group-item">2. LUBANDA</li>
+                        <li class="list-group-item">3. KANKU</li>
+                        <li class="list-group-item">4. MBUYI</li>
+                        <li class="list-group-item">5. TUMBA</li>
+                        <li class="list-group-item">6. Junior</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>6 invitations · 10 places</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE MAYONNAISE -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE MAYONNAISE</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Fideline</li>
+                        <li class="list-group-item">2. MBOMBO</li>
+                        <li class="list-group-item">3. Marie</li>
+                        <li class="list-group-item">4. MISENGA</li>
+                        <li class="list-group-item">5. BLANDINE</li>
+                        <li class="list-group-item">6. KATALAYI</li>
+                        <li class="list-group-item">7. Chimita</li>
+                        <li class="list-group-item">8. Olivier</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>8 invitations · 12 places</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE FAST -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE FAST</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Pasteur Pierre</li>
+                        <li class="list-group-item">2. Henriette</li>
+                        <li class="list-group-item">3. Abigael</li>
+                        <li class="list-group-item">4. GAGA</li>
+                        <li class="list-group-item">5. Ceci</li>
+                        <li class="list-group-item">6. Héritier</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>6 invitations · 10 places</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE GENIE -->
+        <div class="col-md-4 mb-4">
+            <div class="card table-card shadow-sm h-100">
+                <div class="card-header bg-gold text-white">
+                    <h5 class="mb-0">TABLE GENIE</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Parfaite</li>
+                        <li class="list-group-item">2. EBENE</li>
+                        <li class="list-group-item">3. Désiré</li>
+                        <li class="list-group-item">4. Miglo</li>
+                        <li class="list-group-item">5. Bangula</li>
+                        <li class="list-group-item">6. Kasongo</li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    <strong>6 invitations · 10 places</strong>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-</body>
-</html>
+</div>
