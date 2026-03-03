@@ -131,20 +131,9 @@
         }
         
         @media (max-width: 768px) {
-            .invitation-header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .couple-photo {
-                width: 150px;
-                height: 150px;
-                margin-top: -75px;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-                padding: 20px;
-            }
+            .invitation-header h1 { font-size: 1.8rem; }
+            .couple-photo { width: 150px; height: 150px; margin-top: -75px; }
+            .info-grid { grid-template-columns: 1fr; padding: 20px; }
         }
     </style>
 </head>
@@ -168,34 +157,45 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     
     <script>
+        // Récupérer TOUTES les données depuis l'URL
         const urlParams = new URLSearchParams(window.location.search);
-        const inviteId = urlParams.get('id');
         
-        let invites = JSON.parse(localStorage.getItem('invites')) || [];
-        let tables = JSON.parse(localStorage.getItem('tables')) || [];
-        let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+        const invite = {
+            id: urlParams.get('id'),
+            nom: urlParams.get('nom') || 'Invité',
+            evenementId: urlParams.get('evenementId'),
+            tableId: urlParams.get('tableId'),
+            email: urlParams.get('email'),
+            telephone: urlParams.get('telephone'),
+            boisson1: urlParams.get('boisson1') || '',
+            boisson2: urlParams.get('boisson2') || '',
+            message: urlParams.get('message') || '',
+            confirmation: urlParams.get('confirmation') || 'non'
+        };
         
-        const invite = invites.find(i => i.id == inviteId);
+        // Données de secours pour l'événement (simulées)
+        const evenement = {
+            nom: 'Mariage Guelor & Naomie',
+            date: '07/03/2026',
+            heure: '19:00',
+            lieu: 'GLORIOUS PALACE',
+            adresse: 'Av. Mvunda 21, Kinshasa',
+            telephone: '+243 82 124 8030',
+            email: 'guelormuya2@gmail.com',
+            photo: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80'
+        };
         
-        if (!invite) {
+        const table = {
+            nom: invite.tableId ? `Table ${invite.tableId}` : null
+        };
+        
+        if (!invite.id) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'block';
         } else {
             document.getElementById('loading').style.display = 'none';
-            
-            const table = tables.find(t => t.id === invite.tableId);
-            const evenement = evenements.find(e => e.id === invite.evenementId) || {
-                nom: 'Événement',
-                date: '07/03/2026',
-                heure: '19:00',
-                lieu: 'GLORIOUS PALACE',
-                adresse: 'Kinshasa',
-                telephone: '+243 82 124 8030',
-                email: 'contact@mariage.com',
-                photo: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80'
-            };
-            
             document.getElementById('content').style.display = 'block';
+            
             document.getElementById('content').innerHTML = `
                 <div class="invitation-card">
                     <div class="invitation-header">
@@ -229,7 +229,7 @@
                         </div>
                     </div>
                     
-                    ${table ? `
+                    ${table.nom ? `
                         <div class="table-info">
                             <i class="fas fa-chair me-2"></i>
                             Vous serez à la table <strong>${table.nom}</strong>
@@ -237,31 +237,26 @@
                     ` : ''}
                     
                     <div class="boissons-section">
-                        <h4 class="text-center mb-3">Vos préférences (optionnel)</h4>
+                        <h4 class="text-center mb-3">Vos préférences</h4>
                         
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="boisson-option ${invite.boisson1 ? 'selected' : ''}" onclick="choisirBoisson(1)">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="boisson1" ${invite.boisson1 ? 'checked' : ''}>
-                                        <label>1er choix : ${invite.boisson1 || 'Non choisi'}</label>
-                                    </div>
+                                <div class="boisson-option ${invite.boisson1 ? 'selected' : ''}">
+                                    <p><strong>1er choix :</strong> ${invite.boisson1 || 'Non choisi'}</p>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="boisson-option ${invite.boisson2 ? 'selected' : ''}" onclick="choisirBoisson(2)">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="boisson2" ${invite.boisson2 ? 'checked' : ''}>
-                                        <label>2ème choix : ${invite.boisson2 || 'Non choisi'}</label>
-                                    </div>
+                                <div class="boisson-option ${invite.boisson2 ? 'selected' : ''}">
+                                    <p><strong>2ème choix :</strong> ${invite.boisson2 || 'Non choisi'}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="mt-3">
-                            <label class="form-label">Message (optionnel)</label>
-                            <textarea id="message" class="form-control" rows="3">${invite.message || ''}</textarea>
-                        </div>
+                        ${invite.message ? `
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <p class="fst-italic mb-0">"${invite.message}"</p>
+                            </div>
+                        ` : ''}
                         
                         <div class="mt-4">
                             ${invite.confirmation === 'oui' ? `
@@ -275,12 +270,7 @@
                                     Vous avez décliné l'invitation.
                                 </div>
                             ` : `
-                                <button class="btn btn-gold" onclick="confirmer()">
-                                    <i class="fas fa-check-circle me-2"></i>Confirmer ma présence
-                                </button>
-                                <button class="btn btn-outline-danger w-100" onclick="refuser()">
-                                    <i class="fas fa-times-circle me-2"></i>Je ne pourrai pas venir
-                                </button>
+                                <p class="text-center text-muted mb-3">Pour confirmer ou modifier vos choix, contactez les organisateurs.</p>
                             `}
                         </div>
                     </div>
@@ -299,81 +289,6 @@
                     </div>
                 </div>
             `;
-        }
-        
-        function choisirBoisson(num) {
-            const options = ['vin', 'biere', 'champagne', 'jus', 'eau', 'soda'];
-            const labels = ['Vin', 'Bière', 'Champagne', 'Jus', 'Eau', 'Soda'];
-            
-            let selectHtml = '<select id="boissonSelect" class="form-select">';
-            selectHtml += '<option value="">Aucune préférence</option>';
-            options.forEach((opt, idx) => {
-                selectHtml += `<option value="${opt}">${labels[idx]}</option>`;
-            });
-            selectHtml += '</select>';
-            
-            Swal.fire({
-                title: `Choix boisson ${num}`,
-                html: selectHtml,
-                confirmButtonText: 'Valider',
-                confirmButtonColor: '#D4AF37',
-                showCancelButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const choix = document.getElementById('boissonSelect').value;
-                    const index = invites.findIndex(i => i.id == inviteId);
-                    if (index !== -1) {
-                        if (num === 1) invites[index].boisson1 = choix;
-                        else invites[index].boisson2 = choix;
-                        localStorage.setItem('invites', JSON.stringify(invites));
-                        window.location.reload();
-                    }
-                }
-            });
-        }
-        
-        function confirmer() {
-            const message = document.getElementById('message')?.value || '';
-            const index = invites.findIndex(i => i.id == inviteId);
-            
-            Swal.fire({
-                title: 'Confirmation',
-                text: 'Confirmez-vous votre présence ?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                confirmButtonText: 'Oui'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    invites[index].confirmation = 'oui';
-                    invites[index].message = message;
-                    localStorage.setItem('invites', JSON.stringify(invites));
-                    Swal.fire('Merci!', 'Votre présence est confirmée', 'success').then(() => {
-                        window.location.reload();
-                    });
-                }
-            });
-        }
-        
-        function refuser() {
-            const index = invites.findIndex(i => i.id == inviteId);
-            
-            Swal.fire({
-                title: 'Refus',
-                text: 'Vous ne pourrez pas venir ?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'Oui'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    invites[index].confirmation = 'refuse';
-                    localStorage.setItem('invites', JSON.stringify(invites));
-                    Swal.fire('Réponse enregistrée', 'Merci de nous avoir prévenus', 'info').then(() => {
-                        window.location.reload();
-                    });
-                }
-            });
         }
     </script>
 </body>

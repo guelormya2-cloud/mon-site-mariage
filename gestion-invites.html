@@ -61,14 +61,9 @@
             border-radius: 8px 8px 0 0;
         }
         
-        .badge {
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        
-        .badge-confirme { background-color: #28a745; color: white; }
-        .badge-attente { background-color: #ffc107; color: black; }
-        .badge-refuse { background-color: #dc3545; color: white; }
+        .badge-confirme { background-color: #28a745; color: white; padding: 5px 10px; border-radius: 4px; }
+        .badge-attente { background-color: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; }
+        .badge-refuse { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; }
         
         .btn-group {
             gap: 5px;
@@ -82,18 +77,9 @@
         }
         
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn-group .btn {
-                width: 100%;
-                margin-bottom: 5px;
-            }
+            .container { padding: 10px; }
+            .btn-group { flex-direction: column; }
+            .btn-group .btn { width: 100%; margin-bottom: 5px; }
         }
     </style>
 </head>
@@ -105,6 +91,7 @@
             }
         })();
 
+        // Données partagées
         let invites = JSON.parse(localStorage.getItem('invites')) || [];
         let tables = JSON.parse(localStorage.getItem('tables')) || [];
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
@@ -114,8 +101,23 @@
             afficherInvites();
         }
         
-        function genererLienInvitation(id) {
-            return `https://guelormya2-cloud.github.io/mon-site-mariage/invitation.html?id=${id}`;
+        // GÉNÉRER UN LIEN PUBLIC avec paramètres
+        function genererLienInvitation(invite) {
+            const baseUrl = window.location.origin + window.location.pathname.replace('gestion-invites.html', 'invitation.html');
+            const params = new URLSearchParams({
+                id: invite.id,
+                nom: invite.nom,
+                evenementId: invite.evenementId || '',
+                tableId: invite.tableId || '',
+                email: invite.email || '',
+                telephone: invite.telephone || '',
+                boisson1: invite.boisson1 || '',
+                boisson2: invite.boisson2 || '',
+                message: invite.message || '',
+                confirmation: invite.confirmation || 'non'
+            }).toString();
+            
+            return `${baseUrl}?${params}`;
         }
     </script>
 
@@ -183,11 +185,9 @@
             if (filtreEvenement) {
                 invitesFiltres = invitesFiltres.filter(i => i.evenementId == filtreEvenement);
             }
-            
             if (filtreTable) {
                 invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
             }
-            
             if (filtreConfirmation) {
                 invitesFiltres = invitesFiltres.filter(i => i.confirmation === filtreConfirmation);
             }
@@ -204,8 +204,7 @@
                 return;
             }
             
-            invitesFiltres.forEach((invite, index) => {
-                const originalIndex = invites.findIndex(i => i.id === invite.id);
+            invitesFiltres.forEach((invite) => {
                 const table = tables.find(t => t.id === invite.tableId);
                 const evenement = evenements.find(e => e.id === invite.evenementId);
                 
@@ -220,12 +219,14 @@
                     badgeTexte = 'Refusé';
                 }
                 
+                const lien = genererLienInvitation(invite);
+                
                 container.innerHTML += `
                     <div class="guest-card">
                         <div class="guest-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">${invite.nom}</h5>
-                                <span class="badge ${badgeClass}">${badgeTexte}</span>
+                                <span class="${badgeClass}">${badgeTexte}</span>
                             </div>
                         </div>
                         <div class="card-body">
@@ -237,30 +238,29 @@
                                     <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || '-'}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Boissons:</strong></p>
-                                    <ul>
-                                        <li>1: ${invite.boisson1 || '-'}</li>
-                                        <li>2: ${invite.boisson2 || '-'}</li>
-                                    </ul>
+                                    <p><strong>Boissons:</strong> ${invite.boisson1 || '-'} / ${invite.boisson2 || '-'}</p>
                                     <p class="fst-italic">"${invite.message || 'Aucun message'}"</p>
                                 </div>
                             </div>
                             <div class="btn-group w-100 mt-2">
-                                <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
-                                    <i class="fab fa-whatsapp"></i>
+                                <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp('${encodeURIComponent(lien)}', '${invite.nom}')">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
-                                    <i class="fas fa-envelope"></i>
+                                <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail('${invite.email}', '${encodeURIComponent(lien)}', '${invite.nom}')">
+                                    <i class="fas fa-envelope"></i> Email
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="copierLien(${originalIndex})">
-                                    <i class="fas fa-link"></i>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="copierLien('${lien}')">
+                                    <i class="fas fa-link"></i> Lien
                                 </button>
-                                <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${originalIndex})">
+                                <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${invite.id})">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
+                                <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${invite.id})">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Lien: ${lien.substring(0, 50)}...</small>
                             </div>
                         </div>
                     </div>
@@ -272,7 +272,6 @@
             let evenementOptions = '<option value="">Choisir un événement</option>';
             let tableOptions = '<option value="">Choisir une table</option>';
             
-            // Filtrer les événements non archivés et futurs
             const aujourdhui = new Date().toISOString().split('T')[0];
             const evenementsActifs = evenements.filter(e => !e.archive && e.date >= aujourdhui);
             
@@ -320,7 +319,8 @@
             });
         }
         
-        function modifierInvite(index) {
+        function modifierInvite(id) {
+            const index = invites.findIndex(i => i.id === id);
             const invite = invites[index];
             
             let evenementOptions = '<option value="">Choisir un événement</option>';
@@ -350,7 +350,7 @@
                         <option value="refuse" ${invite.confirmation === 'refuse' ? 'selected' : ''}>Refusé</option>
                     </select>
                     <select id="boisson1" class="swal2-input">
-                        <option value="">Boisson 1 (optionnel)</option>
+                        <option value="">Boisson 1</option>
                         <option value="vin" ${invite.boisson1 === 'vin' ? 'selected' : ''}>Vin</option>
                         <option value="biere" ${invite.boisson1 === 'biere' ? 'selected' : ''}>Bière</option>
                         <option value="champagne" ${invite.boisson1 === 'champagne' ? 'selected' : ''}>Champagne</option>
@@ -359,7 +359,7 @@
                         <option value="soda" ${invite.boisson1 === 'soda' ? 'selected' : ''}>Soda</option>
                     </select>
                     <select id="boisson2" class="swal2-input">
-                        <option value="">Boisson 2 (optionnel)</option>
+                        <option value="">Boisson 2</option>
                         <option value="vin" ${invite.boisson2 === 'vin' ? 'selected' : ''}>Vin</option>
                         <option value="biere" ${invite.boisson2 === 'biere' ? 'selected' : ''}>Bière</option>
                         <option value="champagne" ${invite.boisson2 === 'champagne' ? 'selected' : ''}>Champagne</option>
@@ -390,7 +390,7 @@
             });
         }
         
-        function supprimerInvite(index) {
+        function supprimerInvite(id) {
             Swal.fire({
                 title: 'Confirmation',
                 text: 'Supprimer cet invité ?',
@@ -400,36 +400,30 @@
                 confirmButtonText: 'Oui'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    invites.splice(index, 1);
+                    invites = invites.filter(i => i.id !== id);
                     sauvegarder();
                 }
             });
         }
         
-        function envoyerWhatsApp(index) {
-            const invite = invites[index];
-            const lien = genererLienInvitation(invite.id);
-            const message = `Bonjour ${invite.nom}, voici votre invitation : ${lien}`;
+        function envoyerWhatsApp(lien, nom) {
+            const message = `Bonjour ${nom}, voici votre invitation : ${decodeURIComponent(lien)}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
         }
         
-        function envoyerEmail(index) {
-            const invite = invites[index];
-            if (!invite.email) {
+        function envoyerEmail(email, lien, nom) {
+            if (!email) {
                 Swal.fire('Erreur', 'Email manquant', 'error');
                 return;
             }
-            const lien = genererLienInvitation(invite.id);
-            const sujet = "Invitation à notre événement";
-            const corps = `Bonjour ${invite.nom},\n\nVoici votre invitation : ${lien}`;
-            window.location.href = `mailto:${invite.email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+            const sujet = "Votre invitation";
+            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation : ${decodeURIComponent(lien)}`;
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
         }
         
-        function copierLien(index) {
-            const invite = invites[index];
-            const lien = genererLienInvitation(invite.id);
-            navigator.clipboard.writeText(lien).then(() => {
-                Swal.fire('Copié!', 'Lien copié', 'success');
+        function copierLien(lien) {
+            navigator.clipboard.writeText(decodeURIComponent(lien)).then(() => {
+                Swal.fire('Copié!', 'Lien copié dans le presse-papier', 'success');
             });
         }
         
