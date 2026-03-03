@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation - Mariage Guelor & Naomie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+            --light-beige: #f8f5f0;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-beige);
+            color: var(--dark-gray);
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--black);
+        }
+        
+        .text-gold {
+            color: var(--gold) !important;
+        }
+        
+        .bg-gold {
+            background-color: var(--gold) !important;
+        }
+        
+        .border-gold {
+            border-color: var(--gold) !important;
+        }
+        
+        .invitation-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .invitation-header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .invitation-header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .couple-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: -60px auto 20px;
+            background: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80') center/cover;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .info-section {
+            padding: 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--light-beige);
+            border-radius: 10px;
+            height: 100%;
+        }
+        
+        .info-item i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .info-item h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .info-item p {
+            margin-bottom: 0;
+            color: #6c757d;
+        }
+        
+        .boisson-section {
+            padding: 30px;
+            background: white;
+        }
+        
+        .boisson-option {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .boisson-option:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .boisson-option.selected {
+            border-color: var(--gold);
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+        
+        .boisson-option input {
+            margin-right: 10px;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-outline-gold {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        
+        .btn-outline-gold:hover {
+            background-color: var(--gold);
+            color: white;
+        }
+        
+        .confirmation-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .message-livre-or {
+            background: var(--light-beige);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .message-livre-or textarea {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            resize: vertical;
+        }
+        
+        .message-livre-or textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+        
+        .contact-info {
+            background: var(--black);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .contact-info a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .invitation-header h1 {
+                font-size: 2rem;
+            }
+            
+            .couple-photo {
+                width: 150px;
+                height: 150px;
+                margin-top: -50px;
+            }
+            
+            .info-item {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <!-- Récupération de l'ID de l'invité dans l'URL -->
+        <div id="invitation-content" style="display: none;">
+            <!-- Le contenu sera affiché par JavaScript -->
+        </div>
+        
+        <div id="loading-message" class="text-center py-5">
+            <div class="spinner-border text-gold" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-3">Chargement de votre invitation...</p>
+        </div>
+        
+        <div id="error-message" class="text-center py-5" style="display: none;">
+            <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
+            <h3>Invitation non trouvée</h3>
+            <p class="text-muted">Le lien que vous avez utilisé n'est pas valide.</p>
+            <a href="#" onclick="window.location.reload()" class="btn btn-gold mt-3">
+                <i class="fas fa-redo me-2"></i>Réessayer
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        // Récupérer l'ID de l'invité dans l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteId = urlParams.get('id');
+        
+        // Charger les données
+        let invites = JSON.parse(localStorage.getItem('invites')) || [];
+        let tables = JSON.parse(localStorage.getItem('tables')) || [];
+        
+        // Trouver l'invité correspondant
+        const invite = invites.find(i => i.id == inviteId);
+        
+        if (!invite) {
+            document.getElementById('loading-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+        } else {
+            document.getElementById('loading-message').style.display = 'none';
+            document.getElementById('invitation-content').style.display = 'block';
+            
+            // Trouver la table de l'invité
+            const table = tables.find(t => t.id === invite.tableId);
+            
+            // Initialiser les choix de boisson
+            let boisson1 = invite.boisson1 || '';
+            let boisson2 = invite.boisson2 || '';
+            
+            // Afficher le contenu
+            document.getElementById('invitation-content').innerHTML = `
+                <div class="invitation-card">
+                    <div class="invitation-header">
+                        <h1>Guelor & Naomie</h1>
+                        <p class="lead mb-0">Vous invitent à célébrer leur mariage</p>
+                    </div>
+                    
+                    <div class="couple-photo"></div>
+                    
+                    <div class="info-section">
+                        <h2 class="text-center mb-4">Cher(e) ${invite.nom},</h2>
+                        <p class="text-center lead">Nous avons le plaisir de vous inviter à notre mariage</p>
+                        
+                        <div class="row mt-5">
+                            <div class="col-md-4 mb-4">
+                                <div class="info-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <h4>Date</h4>
+                                    <p>Samedi 07 Mars 2026</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <h4>Heure</h4>
+                                    <p>19h00 - 04h00</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <h4>Lieu</h4>
+                                    <p>GLORIOUS PALACE<br>Av. Mvunda 21, Kinshasa</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${table ? `
+                        <div class="text-center mt-3">
+                            <div class="alert alert-info d-inline-block">
+                                <i class="fas fa-chair me-2"></i>
+                                Vous êtes à la table : <strong>${table.nom}</strong>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="boisson-section">
+                        <h3 class="text-center mb-4">
+                            <i class="fas fa-glass-cheers text-gold me-2"></i>
+                            Choix des boissons
+                        </h3>
+                        <p class="text-center text-muted mb-4">Veuillez choisir deux boissons que vous souhaitez consommer</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'vin' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'vin')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="vin" value="vin" ${boisson1 === 'vin' ? 'checked' : ''} onchange="choisirBoisson1('vin')">
+                                        <label class="form-check-label" for="vin">
+                                            <i class="fas fa-wine-glass-alt me-2"></i>
+                                            <strong>Vin</strong> (rouge ou blanc)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'biere' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'biere')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="biere" value="biere" ${boisson1 === 'biere' ? 'checked' : ''} onchange="choisirBoisson1('biere')">
+                                        <label class="form-check-label" for="biere">
+                                            <i class="fas fa-beer me-2"></i>
+                                            <strong>Bière</strong> (locale ou importée)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'champagne' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'champagne')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="champagne" value="champagne" ${boisson1 === 'champagne' ? 'checked' : ''} onchange="choisirBoisson1('champagne')">
+                                        <label class="form-check-label" for="champagne">
+                                            <i class="fas fa-glass-cheers me-2"></i>
+                                            <strong>Champagne</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'jus' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'jus')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="jus" value="jus" ${boisson1 === 'jus' ? 'checked' : ''} onchange="choisirBoisson1('jus')">
+                                        <label class="form-check-label" for="jus">
+                                            <i class="fas fa-glass-water me-2"></i>
+                                            <strong>Jus de fruits</strong>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'eau' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'eau')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="eau" value="eau" ${boisson1 === 'eau' ? 'checked' : ''} onchange="choisirBoisson1('eau')">
+                                        <label class="form-check-label" for="eau">
+                                            <i class="fas fa-water me-2"></i>
+                                            <strong>Eau</strong> (plate ou gazeuse)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson1 === 'soda' ? 'selected' : ''}" onclick="selectionnerBoisson(1, 'soda')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson1" id="soda" value="soda" ${boisson1 === 'soda' ? 'checked' : ''} onchange="choisirBoisson1('soda')">
+                                        <label class="form-check-label" for="soda">
+                                            <i class="fas fa-cola me-2"></i>
+                                            <strong>Soda</strong> (Coca, Fanta, etc.)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <h4 class="text-center mb-3">Deuxième choix</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'vin' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'vin')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="vin2" value="vin" ${boisson2 === 'vin' ? 'checked' : ''} onchange="choisirBoisson2('vin')">
+                                        <label class="form-check-label" for="vin2">Vin</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'biere' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'biere')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="biere2" value="biere" ${boisson2 === 'biere' ? 'checked' : ''} onchange="choisirBoisson2('biere')">
+                                        <label class="form-check-label" for="biere2">Bière</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'champagne' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'champagne')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="champagne2" value="champagne" ${boisson2 === 'champagne' ? 'checked' : ''} onchange="choisirBoisson2('champagne')">
+                                        <label class="form-check-label" for="champagne2">Champagne</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'jus' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'jus')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="jus2" value="jus" ${boisson2 === 'jus' ? 'checked' : ''} onchange="choisirBoisson2('jus')">
+                                        <label class="form-check-label" for="jus2">Jus</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'eau' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'eau')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="eau2" value="eau" ${boisson2 === 'eau' ? 'checked' : ''} onchange="choisirBoisson2('eau')">
+                                        <label class="form-check-label" for="eau2">Eau</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="boisson-option ${boisson2 === 'soda' ? 'selected' : ''}" onclick="selectionnerBoisson(2, 'soda')">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="boisson2" id="soda2" value="soda" ${boisson2 === 'soda' ? 'checked' : ''} onchange="choisirBoisson2('soda')">
+                                        <label class="form-check-label" for="soda2">Soda</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-livre-or mt-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-book me-2 text-gold"></i>
+                                Laissez un message dans notre livre d'or
+                            </label>
+                            <textarea id="messageLivreOr" class="form-control" rows="4" placeholder="Écrivez votre message de félicitations...">${invite.message || ''}</textarea>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            ${invite.confirmation === 'oui' ? `
+                                <div class="confirmation-badge mb-3">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Vous avez déjà confirmé votre présence
+                                </div>
+                            ` : ''}
+                            
+                            <button class="btn btn-gold btn-lg me-2" onclick="confirmerPresence()">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Confirmer ma présence
+                            </button>
+                            
+                            <button class="btn btn-outline-gold btn-lg" onclick="refuserPresence()">
+                                <i class="fas fa-times-circle me-2"></i>
+                                Je ne pourrai pas venir
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-phone-alt me-2 text-gold"></i>Contact</h5>
+                                <p class="mb-1">Guelor: <a href="tel:+243821248030">+243 82 124 8030</a></p>
+                                <p>Naomie: <a href="tel:+243XXXXXXXXX">+243 XX XXX XXXX</a></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-envelope me-2 text-gold"></i>Email</h5>
+                                <p class="mb-1"><a href="mailto:guelormuya2@gmail.com">guelormuya2@gmail.com</a></p>
+                                <p><a href="mailto:contact@mariage.com">contact@mariage.com</a></p>
+                            </div>
+                        </div>
+                        <hr class="bg-light">
+                        <p class="text-center mb-0">
+                            <i class="fas fa-heart text-gold me-2"></i>
+                            Au plaisir de vous voir pour célébrer ce jour spécial !
+                            <i class="fas fa-heart text-gold ms-2"></i>
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            // Initialiser les valeurs
+            if (invite.boisson1) choisirBoisson1(invite.boisson1);
+            if (invite.boisson2) choisirBoisson2(invite.boisson2);
+        }
+        
+        function choisirBoisson1(type) {
+            boisson1 = type;
+            document.querySelectorAll('[name="boisson1"]').forEach(radio => {
+                if (radio.checked) {
+                    boisson1 = radio.value;
+                }
+            });
+        }
+        
+        function choisirBoisson2(type) {
+            boisson2 = type;
+            document.querySelectorAll('[name="boisson2"]').forEach(radio => {
+                if (radio.checked) {
+                    boisson2 = radio.value;
+                }
+            });
+        }
+        
+        function selectionnerBoisson(numero, type) {
+            if (numero === 1) {
+                document.getElementById(type).checked = true;
+                choisirBoisson1(type);
+            } else {
+                document.getElementById(type + '2').checked = true;
+                choisirBoisson2(type);
+            }
+        }
+        
+        function confirmerPresence() {
+            const message = document.getElementById('messageLivreOr')?.value || '';
+            const boisson1 = document.querySelector('[name="boisson1"]:checked')?.value || '';
+            const boisson2 = document.querySelector('[name="boisson2"]:checked')?.value || '';
+            
+            if (!boisson1 || !boisson2) {
+                Swal.fire({
+                    title: 'Choix des boissons',
+                    text: 'Veuillez choisir vos deux boissons',
+                    icon: 'warning',
+                    confirmButtonColor: '#D4AF37'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Confirmer votre présence',
+                text: 'Êtes-vous sûr de vouloir confirmer votre présence ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, je serai là !',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mettre à jour l'invité
+                    const index = invites.findIndex(i => i.id == inviteId);
+                    if (index !== -1) {
+                        invites[index].confirmation = 'oui';
+                        invites[index].message = message;
+                        invites[index].boisson1 = boisson1;
+                        invites[index].boisson2 = boisson2;
+                        localStorage.setItem('invites', JSON.stringify(invites));
+                        
+                        Swal.fire({
+                            title: 'Merci !',
+                            text: 'Votre présence est confirmée. Nous avons hâte de vous voir !',
+                            icon: 'success',
+                            confirmButtonColor: '#D4AF37'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            });
+        }
+        
+        function refuserPresence() {
+            Swal.fire({
+                title: 'Refuser l\'invitation',
+                text: 'Êtes-vous sûr de ne pas pouvoir venir ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, je ne pourrai pas venir',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const index = invites.findIndex(i => i.id == inviteId);
+                    if (index !== -1) {
+                        invites[index].confirmation = 'refuse';
+                        localStorage.setItem('invites', JSON.stringify(invites));
+                        
+                        Swal.fire({
+                            title: 'Merci de nous avoir prévenus',
+                            text: 'Nous sommes désolés de ne pas vous voir, mais nous comprenons.',
+                            icon: 'info',
+                            confirmButtonColor: '#D4AF37'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
