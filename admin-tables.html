@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Tables et Invités</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
+            margin-bottom: 30px;
+        }
+        
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--gold) !important;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+        }
+        
+        .table-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .table-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            background-color: var(--gold);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+        
+        .table-header h5 {
+            margin: 0;
+            color: white;
+        }
+        
+        .guest-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .guest-item:last-child {
+            border-bottom: none;
+        }
+        
+        .guest-actions button {
+            margin-left: 5px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            background-color: var(--gold);
+            color: white;
+        }
+        
+        .modal-header .btn-close {
+            color: white;
+        }
+        
+        .progress {
+            height: 5px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .guest-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .guest-actions {
+                margin-top: 10px;
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (!isLoggedIn) {
+                const path = window.location.pathname;
+                const basePath = path.substring(0, path.lastIndexOf('/') + 1);
+                window.location.href = basePath + 'login.html';
+            }
+        })();
+
+        let tablesData = JSON.parse(localStorage.getItem('tablesData')) || [
+            {
+                nom: "MOUTARDE",
+                capacite: 11,
+                invites: [
+                    "Cple TSHISENGE", "Cple Dieudonné", "Cple Mathieu",
+                    "Mme Acoustique", "Cple Cedric", "Mr LUBUIMI", "Mme Fidèle"
+                ]
+            },
+            {
+                nom: "LA TEAM",
+                capacite: 10,
+                invites: [
+                    "Cple NKENKA", "Cple HATSHIDI", "Cple MBUMBA",
+                    "Cple MUAMBA", "Cple Dominique", "Cple KALU", "Cple Donald BIYENGE"
+                ]
+            },
+            {
+                nom: "AQUALIS",
+                capacite: 10,
+                invites: [
+                    "Mr Rémi", "Mr Marc", "Mr Pascal", "Mr Lionnel",
+                    "Cple Andy", "Cple Jean Marie NDA", "Cple Dady"
+                ]
+            },
+            {
+                nom: "SPRING",
+                capacite: 8,
+                invites: [
+                    "Cple LEMA", "Cple MUDIMBI", "Cple BAKULU", "Cple BINTU", "Mr KABAMBA"
+                ]
+            },
+            {
+                nom: "VIP",
+                capacite: 10,
+                invites: [
+                    "Cple Robert", "Cple BUASSA", "Cple Eddy",
+                    "Mr MANGALA", "Mr MUTOMBO", "Mr SPARCK", "Mr MAKINA"
+                ]
+            },
+            {
+                nom: "TARTINE",
+                capacite: 10,
+                invites: [
+                    "Cple KWETE", "Mme BEA", "Mme Rose", "Mme OBONGA",
+                    "Cple Arsène", "Mr Tacite", "Mme Dorcas"
+                ]
+            },
+            {
+                nom: "FRES",
+                capacite: 10,
+                invites: [
+                    "Mme Carmen", "Cple LUBANDA", "Cple KANKU",
+                    "Cple MBUYI", "Cple TUMBA", "Mr Junior"
+                ]
+            },
+            {
+                nom: "MAYONNAISE",
+                capacite: 12,
+                invites: [
+                    "Mme Fideline", "Mme MBOMBO", "Mme Marie", "Mme MISENGA",
+                    "Mme BLANDINE", "Cple KATALAYI", "Mme Chimita", "Cple Olivier"
+                ]
+            },
+            {
+                nom: "FAST",
+                capacite: 10,
+                invites: [
+                    "Cple Pasteur Pierre", "Mme Henriette", "Mme Abigael",
+                    "Cple GAGA", "Cple Ceci", "Mr Héritier"
+                ]
+            },
+            {
+                nom: "GENIE",
+                capacite: 10,
+                invites: [
+                    "Mme Parfaite", "Mr EBENE", "Mr Désiré",
+                    "Mr Miglo", "Mr Bangula", "Cple Kasongo"
+                ]
+            }
+        ];
+
+        let currentTableIndex = null;
+        let currentInviteIndex = null;
+        let tableModal, inviteModal;
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin - Gestion des Tables</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-arrow-left me-1"></i>Tableau de bord
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-card">
+            <div class="row">
+                <div class="col-md-4">
+                    <h3><i class="fas fa-chair me-2"></i> <span id="totalTables">0</span></h3>
+                    <p>Tables</p>
+                </div>
+                <div class="col-md-4">
+                    <h3><i class="fas fa-users me-2"></i> <span id="totalInvites">0</span></h3>
+                    <p>Invités</p>
+                </div>
+                <div class="col-md-4">
+                    <h3><i class="fas fa-door-open me-2"></i> <span id="totalPlaces">0</span></h3>
+                    <p>Places disponibles</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="admin-section">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-gold w-100" onclick="ajouterTable()">
+                        <i class="fas fa-plus-circle me-2"></i>Nouvelle table
+                    </button>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-success w-100" onclick="sauvegarderDonnees()">
+                        <i class="fas fa-save me-2"></i>Sauvegarder
+                    </button>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button class="btn btn-info w-100 text-white" onclick="ajouterInvite()">
+                        <i class="fas fa-user-plus me-2"></i>Nouvel invité
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des tables -->
+        <div class="row" id="tablesContainer"></div>
+    </div>
+
+    <!-- Modal Table -->
+    <div class="modal fade" id="tableModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tableModalTitle">Ajouter une table</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tableForm">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de la table</label>
+                            <input type="text" class="form-control" id="tableNom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Capacité</label>
+                            <input type="number" class="form-control" id="tableCapacite" min="1" value="10" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-gold" onclick="sauvegarderTable()">Sauvegarder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Invité -->
+    <div class="modal fade" id="inviteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="inviteModalTitle">Ajouter un invité</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="inviteForm">
+                        <div class="mb-3">
+                            <label class="form-label">Nom de l'invité</label>
+                            <input type="text" class="form-control" id="inviteNom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Table</label>
+                            <select class="form-select" id="inviteTable"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-gold" onclick="sauvegarderInvite()">Sauvegarder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            tableModal = new bootstrap.Modal(document.getElementById('tableModal'));
+            inviteModal = new bootstrap.Modal(document.getElementById('inviteModal'));
+            afficherTables();
+            mettreAJourStats();
+        });
+
+        function logout() {
+            Swal.fire({
+                title: 'Déconnexion',
+                text: 'Êtes-vous sûr ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#D4AF37',
+                confirmButtonText: 'Oui'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        function afficherTables() {
+            const container = document.getElementById('tablesContainer');
+            container.innerHTML = '';
+
+            tablesData.forEach((table, index) => {
+                const placesOccupees = table.invites.length;
+                const pourcentage = (placesOccupees / table.capacite) * 100;
+                
+                const card = document.createElement('div');
+                card.className = 'col-lg-4 col-md-6';
+                card.innerHTML = `
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-chair me-2"></i>${table.nom}</h5>
+                                <div>
+                                    <button class="btn btn-sm btn-light me-1" onclick="modifierTable(${index})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="supprimerTable(${index})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small>${placesOccupees}/${table.capacite} places</small>
+                                <div class="progress">
+                                    <div class="progress-bar ${pourcentage >= 90 ? 'bg-danger' : pourcentage >= 70 ? 'bg-warning' : 'bg-success'}" 
+                                         style="width: ${pourcentage}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            ${table.invites.map((invite, i) => `
+                                <div class="guest-item">
+                                    <span><i class="fas fa-user me-2"></i>${invite}</span>
+                                    <div class="guest-actions">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="modifierInvite(${index}, ${i})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${index}, ${i})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <button class="btn btn-sm btn-outline-success w-100 mt-2" onclick="ajouterInviteTable(${index})">
+                                <i class="fas fa-plus me-2"></i>Ajouter un invité
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function mettreAJourStats() {
+            document.getElementById('totalTables').textContent = tablesData.length;
+            const totalInvites = tablesData.reduce((sum, t) => sum + t.invites.length, 0);
+            const totalPlaces = tablesData.reduce((sum, t) => sum + t.capacite, 0);
+            document.getElementById('totalInvites').textContent = totalInvites;
+            document.getElementById('totalPlaces').textContent = totalPlaces - totalInvites;
+        }
+
+        function ajouterTable() {
+            currentTableIndex = null;
+            document.getElementById('tableModalTitle').textContent = 'Ajouter une table';
+            document.getElementById('tableNom').value = '';
+            document.getElementById('tableCapacite').value = '10';
+            tableModal.show();
+        }
+
+        function modifierTable(index) {
+            currentTableIndex = index;
+            document.getElementById('tableModalTitle').textContent = 'Modifier la table';
+            document.getElementById('tableNom').value = tablesData[index].nom;
+            document.getElementById('tableCapacite').value = tablesData[index].capacite;
+            tableModal.show();
+        }
+
+        function sauvegarderTable() {
+            const nom = document.getElementById('tableNom').value.trim().toUpperCase();
+            const capacite = parseInt(document.getElementById('tableCapacite').value);
+            
+            if (!nom) {
+                Swal.fire('Erreur', 'Le nom est requis', 'error');
+                return;
+            }
+            
+            if (currentTableIndex !== null) {
+                tablesData[currentTableIndex].nom = nom;
+                tablesData[currentTableIndex].capacite = capacite;
+            } else {
+                tablesData.push({ nom, capacite, invites: [] });
+            }
+            
+            localStorage.setItem('tablesData', JSON.stringify(tablesData));
+            tableModal.hide();
+            afficherTables();
+            mettreAJourStats();
+            Swal.fire('Succès', 'Table sauvegardée', 'success');
+        }
+
+        function supprimerTable(index) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: `Supprimer la table ${tablesData[index].nom} ?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Oui, supprimer'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    tablesData.splice(index, 1);
+                    localStorage.setItem('tablesData', JSON.stringify(tablesData));
+                    afficherTables();
+                    mettreAJourStats();
+                }
+            });
+        }
+
+        function ajouterInvite() {
+            currentTableIndex = null;
+            currentInviteIndex = null;
+            document.getElementById('inviteModalTitle').textContent = 'Ajouter un invité';
+            document.getElementById('inviteNom').value = '';
+            const select = document.getElementById('inviteTable');
+            select.innerHTML = '<option value="">Choisir une table</option>' +
+                tablesData.map((t, i) => `<option value="${i}">${t.nom}</option>`).join('');
+            inviteModal.show();
+        }
+
+        function ajouterInviteTable(index) {
+            currentTableIndex = index;
+            currentInviteIndex = null;
+            document.getElementById('inviteModalTitle').textContent = 'Ajouter un invité';
+            document.getElementById('inviteNom').value = '';
+            const select = document.getElementById('inviteTable');
+            select.innerHTML = tablesData.map((t, i) => 
+                `<option value="${i}" ${i === index ? 'selected' : ''}>${t.nom}</option>`
+            ).join('');
+            inviteModal.show();
+        }
+
+        function modifierInvite(tableIndex, inviteIndex) {
+            currentTableIndex = tableIndex;
+            currentInviteIndex = inviteIndex;
+            document.getElementById('inviteModalTitle').textContent = 'Modifier l\'invité';
+            document.getElementById('inviteNom').value = tablesData[tableIndex].invites[inviteIndex];
+            const select = document.getElementById('inviteTable');
+            select.innerHTML = tablesData.map((t, i) => 
+                `<option value="${i}" ${i === tableIndex ? 'selected' : ''}>${t.nom}</option>`
+            ).join('');
+            inviteModal.show();
+        }
+
+        function sauvegarderInvite() {
+            const nom = document.getElementById('inviteNom').value.trim();
+            const tableIndex = parseInt(document.getElementById('inviteTable').value);
+            
+            if (!nom) {
+                Swal.fire('Erreur', 'Le nom est requis', 'error');
+                return;
+            }
+            
+            if (isNaN(tableIndex)) {
+                Swal.fire('Erreur', 'Veuillez choisir une table', 'error');
+                return;
+            }
+            
+            if (currentTableIndex !== null && currentInviteIndex !== null) {
+                // Modification
+                tablesData[currentTableIndex].invites[currentInviteIndex] = nom;
+                if (currentTableIndex !== tableIndex) {
+                    // Changement de table
+                    tablesData[currentTableIndex].invites.splice(currentInviteIndex, 1);
+                    tablesData[tableIndex].invites.push(nom);
+                }
+            } else {
+                // Nouvel invité
+                tablesData[tableIndex].invites.push(nom);
+            }
+            
+            localStorage.setItem('tablesData', JSON.stringify(tablesData));
+            inviteModal.hide();
+            afficherTables();
+            mettreAJourStats();
+            Swal.fire('Succès', 'Invité sauvegardé', 'success');
+        }
+
+        function supprimerInvite(tableIndex, inviteIndex) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: 'Supprimer cet invité ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Oui'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    tablesData[tableIndex].invites.splice(inviteIndex, 1);
+                    localStorage.setItem('tablesData', JSON.stringify(tablesData));
+                    afficherTables();
+                    mettreAJourStats();
+                }
+            });
+        }
+
+        function sauvegarderDonnees() {
+            localStorage.setItem('tablesData', JSON.stringify(tablesData));
+            Swal.fire('Succès', 'Données sauvegardées', 'success');
+        }
+    </script>
+</body>
+</html>

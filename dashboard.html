@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de Bord - Mariage</title>
+    <title>Tableau de Bord - Mariage Guelor & Naomie</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,7 +15,6 @@
             --black: #000000;
             --dark-gray: #2c2c2c;
             --light-beige: #f8f5f0;
-            --white: #ffffff;
         }
         
         body {
@@ -43,7 +42,8 @@
         }
         
         .event-header {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1600&q=80');
             background-size: cover;
             background-position: center;
             color: white;
@@ -56,12 +56,18 @@
             font-weight: 500;
             border: none;
             padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
         }
         
         .nav-tabs .nav-link.active {
             background-color: transparent;
             color: var(--gold);
             border-bottom: 3px solid var(--gold);
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--dark-gold);
+            background-color: rgba(212, 175, 55, 0.1);
         }
         
         .stat-card {
@@ -73,6 +79,42 @@
         
         .stat-card:hover {
             transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .table-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .table-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table-card .card-header {
+            background-color: var(--gold);
+            color: white;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
         }
         
         .badge-confirmed {
@@ -89,21 +131,6 @@
             border-radius: 4px;
         }
         
-        .table-card {
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .table-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 600;
-        }
-        
         @media (max-width: 768px) {
             .nav-tabs .nav-link {
                 padding: 0.75rem 1rem;
@@ -118,26 +145,12 @@
                 font-size: 2rem;
             }
         }
-        
-        .btn-gold {
-            background-color: var(--gold);
-            border-color: var(--gold);
-            color: white;
-        }
-        
-        .btn-gold:hover {
-            background-color: var(--dark-gold);
-            border-color: var(--dark-gold);
-            color: white;
-        }
     </style>
 </head>
 <body>
     <script>
-        // Vérification de session
         (function() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            
             if (!isLoggedIn) {
                 const path = window.location.pathname;
                 const basePath = path.substring(0, path.lastIndexOf('/') + 1);
@@ -146,35 +159,24 @@
         })();
         
         function logout() {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    title: 'Déconnexion',
-                    text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#D4AF37',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Oui',
-                    cancelButtonText: 'Non'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userEmail');
-                        const path = window.location.pathname;
-                        const basePath = path.substring(0, path.lastIndexOf('/') + 1);
-                        window.location.href = basePath + 'login.html';
-                    }
-                });
-            } else {
-                // Fallback si SweetAlert n'est pas chargé
-                if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            Swal.fire({
+                title: 'Déconnexion',
+                text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#D4AF37',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Non'
+            }).then((result) => {
+                if (result.isConfirmed) {
                     localStorage.removeItem('isLoggedIn');
                     localStorage.removeItem('userEmail');
                     const path = window.location.pathname;
                     const basePath = path.substring(0, path.lastIndexOf('/') + 1);
                     window.location.href = basePath + 'login.html';
                 }
-            }
+            });
         }
     </script>
 
@@ -191,7 +193,9 @@
                         <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Tableau de bord</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-cog me-1"></i>Paramètres</a>
+                        <a class="nav-link" href="admin-tables.html">
+                            <i class="fas fa-cog me-1"></i>Gestion tables
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="javascript:void(0)" onclick="logout()">
@@ -209,12 +213,12 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="display-4 text-gold">Mariage de Guelor et Naomie</h1>
-                    <p class="lead">07/03/2026 • salle de fête GLORIOUS PALACE</p>
+                    <p class="lead">07/03/2026 • Salle GLORIOUS PALACE</p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <div class="bg-gold text-dark d-inline-block px-3 py-2 rounded">
                         <small>Code événement:</small>
-                        <div class="h5 mb-0">EVT-EOMHSGHU</div>
+                        <div class="h5 mb-0">EVT-2026-001</div>
                     </div>
                 </div>
             </div>
@@ -239,11 +243,6 @@
                     <i class="fas fa-chair me-2"></i>Plans de table
                 </button>
             </li>
-            <li class="nav-item">
-                <button class="nav-link" id="guestbook-tab" data-bs-toggle="tab" data-bs-target="#guestbook">
-                    <i class="fas fa-book me-2"></i>Livre d'or
-                </button>
-            </li>
         </ul>
 
         <!-- Contenu des onglets -->
@@ -257,8 +256,8 @@
                                 <div class="text-gold mb-2">
                                     <i class="fas fa-envelope fa-2x"></i>
                                 </div>
-                                <div class="stat-number">118</div>
-                                <p class="card-text">Invitations émises</p>
+                                <div class="stat-number">66</div>
+                                <p class="card-text">Invitations</p>
                             </div>
                         </div>
                     </div>
@@ -269,8 +268,8 @@
                                 <div class="text-success mb-2">
                                     <i class="fas fa-check-circle fa-2x"></i>
                                 </div>
-                                <div class="stat-number">6</div>
-                                <p class="card-text">Confirmées</p>
+                                <div class="stat-number" id="stat-confirmes">0</div>
+                                <p class="card-text">Confirmés</p>
                             </div>
                         </div>
                     </div>
@@ -281,7 +280,7 @@
                                 <div class="text-warning mb-2">
                                     <i class="fas fa-clock fa-2x"></i>
                                 </div>
-                                <div class="stat-number">112</div>
+                                <div class="stat-number" id="stat-attente">0</div>
                                 <p class="card-text">En attente</p>
                             </div>
                         </div>
@@ -291,10 +290,10 @@
                         <div class="card stat-card shadow-sm">
                             <div class="card-body text-center">
                                 <div class="text-info mb-2">
-                                    <i class="fas fa-book fa-2x"></i>
+                                    <i class="fas fa-chair fa-2x"></i>
                                 </div>
-                                <div class="stat-number">8</div>
-                                <p class="card-text">Messages</p>
+                                <div class="stat-number">10</div>
+                                <p class="card-text">Tables</p>
                             </div>
                         </div>
                     </div>
@@ -310,12 +309,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p><strong>Date:</strong> 07/03/2026</p>
-                                        <p><strong>Heure:</strong> 19:00 - 04:00</p>
+                                        <p><strong>Heure:</strong> 19h00 - 04h00</p>
                                         <p><strong>Lieu:</strong> GLORIOUS PALACE</p>
+                                        <p><strong>Adresse:</strong> Av. Mvunda 21, Q/yolo-nord, Kinshasa</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Organisé par:</strong> Guelor & Naomie</p>
-                                        <p><strong>Contact:</strong> contact@mariage.com</p>
+                                        <p><strong>Mariés:</strong> Guelor & Naomie</p>
+                                        <p><strong>Contact:</strong> guelormuya2@gmail.com</p>
                                     </div>
                                 </div>
                             </div>
@@ -325,11 +325,18 @@
                     <div class="col-lg-4 mb-4">
                         <div class="card shadow-sm">
                             <div class="card-header bg-white">
-                                <h5 class="mb-0">Image</h5>
+                                <h5 class="mb-0">Résumé</h5>
                             </div>
-                            <div class="card-body text-center">
-                                <img src="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" 
-                                     alt="Mariage" class="img-fluid rounded">
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li><strong>Total invitations:</strong> 66</li>
+                                    <li><strong>Total tables:</strong> 10</li>
+                                    <li><strong>Capacité totale:</strong> 101 places</li>
+                                </ul>
+                                <hr>
+                                <a href="admin-tables.html" class="btn btn-gold w-100">
+                                    <i class="fas fa-cog me-2"></i>Gérer les tables
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -341,113 +348,29 @@
                 <div class="card">
                     <div class="card-body">
                         <h4>Liste des invités</h4>
-                        <p class="text-muted">118 invitations / 183 personnes</p>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Statut</th>
-                                    <th>Table</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Couple Marie & MISENGA</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>MAYONNAISE</td>
-                                </tr>
-                                <tr>
-                                    <td>Mme MA BLANDINE</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>MAYONNAISE</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr FAMILLE</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>FRES</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple Pierre</td>
-                                    <td><span class="badge-pending">Envoyée</span></td>
-                                    <td>FAST</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple Cple Mathieu</td>
-                                    <td><span class="badge-confirmed">Confirmée</span></td>
-                                    <td>MUTARDE</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <p class="text-muted">Total: 66 invités</p>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Table</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invites-tbody">
+                                    <!-- Rempli par JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Onglet Tables -->
+            <!-- Onglet Plans de table -->
             <div class="tab-pane fade" id="tables">
-                <h4 class="mb-4">Plans de table</h4>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table MAYONNAISE</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>7/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table VIP</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>16/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card table-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">Table SPRING</h5>
-                                <p class="card-text">Capacité: 100 personnes</p>
-                                <p class="card-text"><strong>20/100 places</strong></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Onglet Livre d'or -->
-            <div class="tab-pane fade" id="guestbook">
-                <div class="card">
-                    <div class="card-body">
-                        <h4>Livre d'or</h4>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Invité</th>
-                                    <th>Message</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Couple Andy</td>
-                                    <td>"Heureux mariage"</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr MUTOMBO</td>
-                                    <td>"Félicitations à vous deux !"</td>
-                                </tr>
-                                <tr>
-                                    <td>Couple KABAMBA</td>
-                                    <td>"Que Dieu vous bénisse"</td>
-                                </tr>
-                                <tr>
-                                    <td>Mr MANGALA</td>
-                                    <td>"Bonne fête de mariage"</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <h4 class="mb-4">Plans de Table</h4>
+                <div class="row" id="tables-container">
+                    <!-- Rempli par JavaScript -->
                 </div>
             </div>
         </div>
@@ -455,5 +378,142 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        // Données des tables
+        const tablesData = [
+            {
+                nom: "MOUTARDE",
+                capacite: 11,
+                invites: [
+                    "Cple TSHISENGE", "Cple Dieudonné", "Cple Mathieu",
+                    "Mme Acoustique", "Cple Cedric", "Mr LUBUIMI", "Mme Fidèle"
+                ]
+            },
+            {
+                nom: "LA TEAM",
+                capacite: 10,
+                invites: [
+                    "Cple NKENKA", "Cple HATSHIDI", "Cple MBUMBA",
+                    "Cple MUAMBA", "Cple Dominique", "Cple KALU", "Cple Donald BIYENGE"
+                ]
+            },
+            {
+                nom: "AQUALIS",
+                capacite: 10,
+                invites: [
+                    "Mr Rémi", "Mr Marc", "Mr Pascal", "Mr Lionnel",
+                    "Cple Andy", "Cple Jean Marie NDA", "Cple Dady"
+                ]
+            },
+            {
+                nom: "SPRING",
+                capacite: 8,
+                invites: [
+                    "Cple LEMA", "Cple MUDIMBI", "Cple BAKULU", "Cple BINTU", "Mr KABAMBA"
+                ]
+            },
+            {
+                nom: "VIP",
+                capacite: 10,
+                invites: [
+                    "Cple Robert", "Cple BUASSA", "Cple Eddy",
+                    "Mr MANGALA", "Mr MUTOMBO", "Mr SPARCK", "Mr MAKINA"
+                ]
+            },
+            {
+                nom: "TARTINE",
+                capacite: 10,
+                invites: [
+                    "Cple KWETE", "Mme BEA", "Mme Rose", "Mme OBONGA",
+                    "Cple Arsène", "Mr Tacite", "Mme Dorcas"
+                ]
+            },
+            {
+                nom: "FRES",
+                capacite: 10,
+                invites: [
+                    "Mme Carmen", "Cple LUBANDA", "Cple KANKU",
+                    "Cple MBUYI", "Cple TUMBA", "Mr Junior"
+                ]
+            },
+            {
+                nom: "MAYONNAISE",
+                capacite: 12,
+                invites: [
+                    "Mme Fideline", "Mme MBOMBO", "Mme Marie", "Mme MISENGA",
+                    "Mme BLANDINE", "Cple KATALAYI", "Mme Chimita", "Cple Olivier"
+                ]
+            },
+            {
+                nom: "FAST",
+                capacite: 10,
+                invites: [
+                    "Cple Pasteur Pierre", "Mme Henriette", "Mme Abigael",
+                    "Cple GAGA", "Cple Ceci", "Mr Héritier"
+                ]
+            },
+            {
+                nom: "GENIE",
+                capacite: 10,
+                invites: [
+                    "Mme Parfaite", "Mr EBENE", "Mr Désiré",
+                    "Mr Miglo", "Mr Bangula", "Cple Kasongo"
+                ]
+            }
+        ];
+
+        function afficherTables() {
+            const container = document.getElementById('tables-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            tablesData.forEach(table => {
+                const placesOccupees = table.invites.length;
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-4';
+                card.innerHTML = `
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">TABLE ${table.nom}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><i class="fas fa-users me-2"></i>Capacité: ${table.capacite} places</p>
+                            <p><strong>Places occupées: ${placesOccupees}/${table.capacite}</strong></p>
+                            <hr>
+                            <ol class="list-group list-group-flush">
+                                ${table.invites.map(invite => `<li class="list-group-item">${invite}</li>`).join('')}
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function afficherInvites() {
+            const tbody = document.getElementById('invites-tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            tablesData.forEach(table => {
+                table.invites.forEach(invite => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${invite}</td>
+                        <td>${table.nom}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            afficherTables();
+            afficherInvites();
+        });
+    </script>
 </body>
 </html>
