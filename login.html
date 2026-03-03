@@ -118,10 +118,10 @@
 <body>
     <div class="login-container">
         <div class="login-card">
-            <div class="brand-logo">Mariage Guelor & Naomie</div>
+            <div class="brand-logo">Gestion Mariage</div>
             
             <div class="login-header">
-                <h2><i class="fas fa-lock me-2" style="color: var(--gold);"></i>Connexion</h2>
+                <h2><i class="fas fa-lock me-2" style="color: var(--gold);"></i>Connexion Admin</h2>
                 <p class="text-muted">Espace organisateur</p>
             </div>
             
@@ -172,7 +172,6 @@
                 if (email === "guelormuya2@gmail.com" && password === "Glm@1991") {
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userEmail', email);
-                    // CORRECTION : redirection vers dashboard.html sans préfixe
                     window.location.href = 'dashboard.html';
                 } else {
                     alertDiv.style.display = 'block';
@@ -187,7 +186,6 @@
             }, 1000);
         }
 
-        // Vérification si déjà connecté
         if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'dashboard.html';
         }

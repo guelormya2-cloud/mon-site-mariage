@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Gestion des événements</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #000 0%, #2c2c2c 100%);
+            margin-bottom: 20px;
+        }
+        
+        .navbar-brand {
+            color: var(--gold) !important;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+        }
+        
+        .event-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .event-header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 15px;
+        }
+        
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .photo-upload {
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .photo-upload:hover {
+            border-color: var(--gold);
+        }
+        
+        .photo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        
+        .info-item {
+            margin-bottom: 10px;
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .event-image {
+                height: 150px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        // Données des événements
+        let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+        
+        // Événement par défaut si aucun n'existe
+        if (evenements.length === 0) {
+            evenements = [
+                {
+                    id: 1,
+                    nom: "Mariage Guelor & Naomie",
+                    date: "2026-03-07",
+                    heure: "19:00",
+                    lieu: "GLORIOUS PALACE",
+                    adresse: "Av. Mvunda 21, Q/yolo-nord, Kinshasa",
+                    telephone: "+243 82 124 8030",
+                    email: "guelormuya2@gmail.com",
+                    photo: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
+                    actif: true
+                }
+            ];
+            localStorage.setItem('evenements', JSON.stringify(evenements));
+        }
+
+        function sauvegarder() {
+            localStorage.setItem('evenements', JSON.stringify(evenements));
+            afficherEvenements();
+        }
+    </script>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestion des événements</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Bouton d'ajout -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <button class="btn btn-gold" onclick="ajouterEvenement()">
+                    <i class="fas fa-plus me-2"></i>Nouvel événement
+                </button>
+            </div>
+        </div>
+        
+        <!-- Liste des événements -->
+        <div class="row" id="evenementsContainer">
+            <!-- Les événements seront affichés ici -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
+        function afficherEvenements() {
+            const container = document.getElementById('evenementsContainer');
+            container.innerHTML = '';
+            
+            if (evenements.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                            <h5>Aucun événement</h5>
+                            <p>Cliquez sur "Nouvel événement" pour commencer</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            evenements.forEach((event, index) => {
+                const actif = event.actif ? 'Événement actif' : 'Inactif';
+                const badgeClass = event.actif ? 'bg-success' : 'bg-secondary';
+                
+                container.innerHTML += `
+                    <div class="col-md-6 mb-4">
+                        <div class="event-card">
+                            <div class="event-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">${event.nom}</h5>
+                                    <span class="badge ${badgeClass}">${actif}</span>
+                                </div>
+                            </div>
+                            <img src="${event.photo}" class="event-image" alt="${event.nom}" onerror="this.src='https://via.placeholder.com/800x400?text=Photo+non+disponible'">
+                            <div class="card-body">
+                                <div class="info-item">
+                                    <label><i class="fas fa-calendar me-2 text-gold"></i>Date:</label>
+                                    <p>${event.date} à ${event.heure}</p>
+                                </div>
+                                <div class="info-item">
+                                    <label><i class="fas fa-map-marker me-2 text-gold"></i>Lieu:</label>
+                                    <p>${event.lieu}<br><small>${event.adresse}</small></p>
+                                </div>
+                                <div class="info-item">
+                                    <label><i class="fas fa-phone me-2 text-gold"></i>Contact:</label>
+                                    <p>${event.telephone} | ${event.email}</p>
+                                </div>
+                                <div class="d-flex gap-2 mt-3">
+                                    <button class="btn btn-sm btn-outline-primary flex-fill" onclick="modifierEvenement(${index})">
+                                        <i class="fas fa-edit me-1"></i>Modifier
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success flex-fill" onclick="dupliquerEvenement(${index})">
+                                        <i class="fas fa-copy me-1"></i>Dupliquer
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger flex-fill" onclick="supprimerEvenement(${index})">
+                                        <i class="fas fa-trash me-1"></i>Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function ajouterEvenement() {
+            Swal.fire({
+                title: 'Nouvel événement',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" placeholder="Nom de l'événement" value="Nouvel événement">
+                    <input type="date" id="date" class="swal2-input" value="2026-12-31">
+                    <input type="time" id="heure" class="swal2-input" value="19:00">
+                    <input type="text" id="lieu" class="swal2-input" placeholder="Lieu">
+                    <textarea id="adresse" class="swal2-textarea" placeholder="Adresse complète"></textarea>
+                    <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
+                    <input type="email" id="email" class="swal2-input" placeholder="Email">
+                `,
+                confirmButtonText: 'Créer',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                cancelButtonText: 'Annuler',
+                preConfirm: () => {
+                    const nom = document.getElementById('nom').value.trim();
+                    if (!nom) {
+                        Swal.showValidationMessage('Le nom est requis');
+                        return false;
+                    }
+                    
+                    evenements.push({
+                        id: Date.now(),
+                        nom: nom,
+                        date: document.getElementById('date').value,
+                        heure: document.getElementById('heure').value,
+                        lieu: document.getElementById('lieu').value,
+                        adresse: document.getElementById('adresse').value,
+                        telephone: document.getElementById('telephone').value,
+                        email: document.getElementById('email').value,
+                        photo: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                        actif: false
+                    });
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function modifierEvenement(index) {
+            const event = evenements[index];
+            
+            Swal.fire({
+                title: 'Modifier l\'événement',
+                html: `
+                    <input type="text" id="nom" class="swal2-input" value="${event.nom}">
+                    <input type="date" id="date" class="swal2-input" value="${event.date}">
+                    <input type="time" id="heure" class="swal2-input" value="${event.heure}">
+                    <input type="text" id="lieu" class="swal2-input" value="${event.lieu}">
+                    <textarea id="adresse" class="swal2-textarea">${event.adresse || ''}</textarea>
+                    <input type="tel" id="telephone" class="swal2-input" value="${event.telephone || ''}">
+                    <input type="email" id="email" class="swal2-input" value="${event.email || ''}">
+                    <input type="url" id="photo" class="swal2-input" value="${event.photo}" placeholder="URL de la photo">
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="actif" ${event.actif ? 'checked' : ''}>
+                        <label class="form-check-label">Événement actif</label>
+                    </div>
+                `,
+                confirmButtonText: 'Modifier',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                cancelButtonText: 'Annuler',
+                preConfirm: () => {
+                    evenements[index] = {
+                        ...event,
+                        nom: document.getElementById('nom').value,
+                        date: document.getElementById('date').value,
+                        heure: document.getElementById('heure').value,
+                        lieu: document.getElementById('lieu').value,
+                        adresse: document.getElementById('adresse').value,
+                        telephone: document.getElementById('telephone').value,
+                        email: document.getElementById('email').value,
+                        photo: document.getElementById('photo').value,
+                        actif: document.getElementById('actif').checked
+                    };
+                    sauvegarder();
+                }
+            });
+        }
+        
+        function dupliquerEvenement(index) {
+            const event = evenements[index];
+            const nouveauEvent = {
+                ...event,
+                id: Date.now(),
+                nom: event.nom + ' (copie)',
+                actif: false
+            };
+            evenements.push(nouveauEvent);
+            sauvegarder();
+            Swal.fire('Succès', 'Événement dupliqué', 'success');
+        }
+        
+        function supprimerEvenement(index) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: `Supprimer l'événement ${evenements[index].nom} ?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    evenements.splice(index, 1);
+                    sauvegarder();
+                    Swal.fire('Supprimé!', 'Événement supprimé', 'success');
+                }
+            });
+        }
+        
+        afficherEvenements();
+    </script>
+</body>
+</html>

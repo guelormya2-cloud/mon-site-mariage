@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des invités - Mariage Guelor & Naomie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Gestion des invités</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -52,11 +52,6 @@
             border-radius: 8px;
             margin-bottom: 15px;
             background: white;
-            transition: all 0.3s ease;
-        }
-        
-        .guest-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .guest-header {
@@ -66,72 +61,46 @@
             border-radius: 8px 8px 0 0;
         }
         
-        .guest-header h5 {
-            margin: 0;
-            color: white;
-        }
-        
         .badge {
             padding: 5px 10px;
             border-radius: 4px;
-            font-weight: normal;
         }
         
-        .badge-confirme {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .badge-attente {
-            background-color: #ffc107;
-            color: black;
-        }
-        
-        .badge-refuse {
-            background-color: #dc3545;
-            color: white;
-        }
+        .badge-confirme { background-color: #28a745; color: white; }
+        .badge-attente { background-color: #ffc107; color: black; }
+        .badge-refuse { background-color: #dc3545; color: white; }
         
         .btn-group {
             gap: 5px;
         }
         
-        .btn-group .btn {
-            flex: 1;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-        
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            color: var(--gold);
-        }
-        
-        .filters {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
 <body>
     <script>
-        // Vérification de connexion
         (function() {
             if (localStorage.getItem('isLoggedIn') !== 'true') {
                 window.location.href = 'login.html';
             }
         })();
 
-        // Données
         let invites = JSON.parse(localStorage.getItem('invites')) || [];
         let tables = JSON.parse(localStorage.getItem('tables')) || [];
+        let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
         
         function sauvegarder() {
             localStorage.setItem('invites', JSON.stringify(invites));
@@ -159,31 +128,32 @@
     </nav>
 
     <div class="container mt-4">
-        <!-- Filtres -->
-        <div class="filters">
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <select class="form-select" id="filtreTable" onchange="afficherInvites()">
-                        <option value="">Toutes les tables</option>
-                    </select>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <select class="form-select" id="filtreConfirmation" onchange="afficherInvites()">
-                        <option value="">Tous les statuts</option>
-                        <option value="oui">Confirmés</option>
-                        <option value="non">En attente</option>
-                        <option value="refuse">Refusés</option>
-                    </select>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <button class="btn btn-gold w-100" onclick="ajouterInvite()">
-                        <i class="fas fa-plus me-2"></i>Nouvel invité
-                    </button>
-                </div>
+        <div class="row mb-4">
+            <div class="col-md-3 mb-2">
+                <select class="form-select" id="filtreEvenement" onchange="afficherInvites()">
+                    <option value="">Tous les événements</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <select class="form-select" id="filtreTable" onchange="afficherInvites()">
+                    <option value="">Toutes les tables</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <select class="form-select" id="filtreConfirmation" onchange="afficherInvites()">
+                    <option value="">Tous les statuts</option>
+                    <option value="oui">Confirmés</option>
+                    <option value="non">En attente</option>
+                    <option value="refuse">Refusés</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <button class="btn btn-gold w-100" onclick="ajouterInvite()">
+                    <i class="fas fa-plus me-2"></i>Nouvel invité
+                </button>
             </div>
         </div>
 
-        <!-- Liste des invités -->
         <div id="invitesContainer"></div>
     </div>
 
@@ -193,10 +163,15 @@
     <script>
         function afficherInvites() {
             const container = document.getElementById('invitesContainer');
+            const filtreEvenement = document.getElementById('filtreEvenement').value;
             const filtreTable = document.getElementById('filtreTable').value;
             const filtreConfirmation = document.getElementById('filtreConfirmation').value;
             
             let invitesFiltres = invites;
+            
+            if (filtreEvenement) {
+                invitesFiltres = invitesFiltres.filter(i => i.evenementId == filtreEvenement);
+            }
             
             if (filtreTable) {
                 invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
@@ -210,8 +185,8 @@
             
             if (invitesFiltres.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-4x text-muted mb-3"></i>
                         <h5>Aucun invité trouvé</h5>
                         <p>Cliquez sur "Nouvel invité" pour commencer</p>
                     </div>
@@ -220,9 +195,9 @@
             }
             
             invitesFiltres.forEach((invite, index) => {
-                // Trouver l'index réel dans le tableau original
                 const originalIndex = invites.findIndex(i => i.id === invite.id);
                 const table = tables.find(t => t.id === invite.tableId);
+                const evenement = evenements.find(e => e.id === invite.evenementId);
                 
                 let badgeClass = 'badge-attente';
                 let badgeTexte = 'En attente';
@@ -246,32 +221,37 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
+                                    <p><i class="fas fa-calendar me-2 text-gold"></i>Événement: <strong>${evenement ? evenement.nom : 'Non assigné'}</strong></p>
                                     <p><i class="fas fa-chair me-2 text-gold"></i>Table: <strong>${table ? table.nom : 'Non assigné'}</strong></p>
                                     <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || 'Non renseigné'}</p>
                                     <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || 'Non renseigné'}</p>
-                                    <p><i class="fas fa-glass-cheers me-2 text-gold"></i>Boisson: ${invite.boisson || 'Non choisi'}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong><i class="fas fa-book me-2 text-gold"></i>Livre d'or:</strong></p>
-                                    <p class="text-muted fst-italic border-start border-3 border-gold ps-3">"${invite.message || 'Aucun message'}"</p>
+                                    <p><i class="fas fa-glass-cheers me-2 text-gold"></i>Boissons:</p>
+                                    <ul>
+                                        <li>1er choix: ${invite.boisson1 || 'Non choisi'}</li>
+                                        <li>2ème choix: ${invite.boisson2 || 'Non choisi'}</li>
+                                    </ul>
+                                    <p><i class="fas fa-book me-2 text-gold"></i>Message:</p>
+                                    <p class="fst-italic">"${invite.message || 'Aucun message'}"</p>
                                 </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <div class="btn-group w-100">
-                                        <button class="btn btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
+                                        <button class="btn btn-sm btn-outline-success" onclick="envoyerWhatsApp(${originalIndex})">
                                             <i class="fab fa-whatsapp"></i> WhatsApp
                                         </button>
-                                        <button class="btn btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="envoyerEmail(${originalIndex})">
                                             <i class="fas fa-envelope"></i> Email
                                         </button>
-                                        <button class="btn btn-outline-secondary" onclick="copierLien(${originalIndex})">
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="copierLien(${originalIndex})">
                                             <i class="fas fa-link"></i> Lien
                                         </button>
-                                        <button class="btn btn-outline-warning" onclick="modifierInvite(${originalIndex})">
-                                            <i class="fas fa-edit"></i>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${originalIndex})">
+                                            <i class="fas fa-edit"></i> Modifier
                                         </button>
-                                        <button class="btn btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
+                                        <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${originalIndex})">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -284,7 +264,13 @@
         }
         
         function ajouterInvite() {
+            let evenementOptions = '<option value="">Sélectionner un événement</option>';
             let tableOptions = '<option value="">Sélectionner une table</option>';
+            
+            evenements.forEach(e => {
+                evenementOptions += `<option value="${e.id}">${e.nom}</option>`;
+            });
+            
             tables.forEach(t => {
                 tableOptions += `<option value="${t.id}">${t.nom}</option>`;
             });
@@ -293,9 +279,10 @@
                 title: 'Nouvel invité',
                 html: `
                     <input type="text" id="nom" class="swal2-input" placeholder="Nom complet" required>
+                    <select id="evenementId" class="swal2-input">${evenementOptions}</select>
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
                     <input type="email" id="email" class="swal2-input" placeholder="Email">
                     <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
-                    <select id="tableId" class="swal2-input">${tableOptions}</select>
                 `,
                 confirmButtonText: 'Créer',
                 confirmButtonColor: '#D4AF37',
@@ -311,13 +298,14 @@
                     invites.push({
                         id: Date.now(),
                         nom: nom,
+                        evenementId: parseInt(document.getElementById('evenementId').value) || null,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
                         email: document.getElementById('email').value,
                         telephone: document.getElementById('telephone').value,
-                        tableId: parseInt(document.getElementById('tableId').value) || null,
                         confirmation: 'non',
-                        boisson: '',
-                        message: '',
-                        repas: ''
+                        boisson1: '',
+                        boisson2: '',
+                        message: ''
                     });
                     sauvegarder();
                 }
@@ -327,7 +315,14 @@
         function modifierInvite(index) {
             const invite = invites[index];
             
+            let evenementOptions = '<option value="">Sélectionner un événement</option>';
             let tableOptions = '<option value="">Sélectionner une table</option>';
+            
+            evenements.forEach(e => {
+                const selected = e.id === invite.evenementId ? 'selected' : '';
+                evenementOptions += `<option value="${e.id}" ${selected}>${e.nom}</option>`;
+            });
+            
             tables.forEach(t => {
                 const selected = t.id === invite.tableId ? 'selected' : '';
                 tableOptions += `<option value="${t.id}" ${selected}>${t.nom}</option>`;
@@ -337,21 +332,32 @@
                 title: 'Modifier invité',
                 html: `
                     <input type="text" id="nom" class="swal2-input" value="${invite.nom}">
+                    <select id="evenementId" class="swal2-input">${evenementOptions}</select>
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
                     <input type="email" id="email" class="swal2-input" value="${invite.email || ''}">
                     <input type="tel" id="telephone" class="swal2-input" value="${invite.telephone || ''}">
-                    <select id="tableId" class="swal2-input">${tableOptions}</select>
                     <select id="confirmation" class="swal2-input">
                         <option value="non" ${invite.confirmation === 'non' ? 'selected' : ''}>En attente</option>
                         <option value="oui" ${invite.confirmation === 'oui' ? 'selected' : ''}>Confirmé</option>
                         <option value="refuse" ${invite.confirmation === 'refuse' ? 'selected' : ''}>Refusé</option>
                     </select>
-                    <select id="boisson" class="swal2-input">
-                        <option value="">Choisir boisson</option>
-                        <option value="vin" ${invite.boisson === 'vin' ? 'selected' : ''}>Vin</option>
-                        <option value="biere" ${invite.boisson === 'biere' ? 'selected' : ''}>Bière</option>
-                        <option value="jus" ${invite.boisson === 'jus' ? 'selected' : ''}>Jus</option>
-                        <option value="eau" ${invite.boisson === 'eau' ? 'selected' : ''}>Eau</option>
-                        <option value="champagne" ${invite.boisson === 'champagne' ? 'selected' : ''}>Champagne</option>
+                    <select id="boisson1" class="swal2-input">
+                        <option value="">1er choix boisson (optionnel)</option>
+                        <option value="vin" ${invite.boisson1 === 'vin' ? 'selected' : ''}>Vin</option>
+                        <option value="biere" ${invite.boisson1 === 'biere' ? 'selected' : ''}>Bière</option>
+                        <option value="champagne" ${invite.boisson1 === 'champagne' ? 'selected' : ''}>Champagne</option>
+                        <option value="jus" ${invite.boisson1 === 'jus' ? 'selected' : ''}>Jus</option>
+                        <option value="eau" ${invite.boisson1 === 'eau' ? 'selected' : ''}>Eau</option>
+                        <option value="soda" ${invite.boisson1 === 'soda' ? 'selected' : ''}>Soda</option>
+                    </select>
+                    <select id="boisson2" class="swal2-input">
+                        <option value="">2ème choix boisson (optionnel)</option>
+                        <option value="vin" ${invite.boisson2 === 'vin' ? 'selected' : ''}>Vin</option>
+                        <option value="biere" ${invite.boisson2 === 'biere' ? 'selected' : ''}>Bière</option>
+                        <option value="champagne" ${invite.boisson2 === 'champagne' ? 'selected' : ''}>Champagne</option>
+                        <option value="jus" ${invite.boisson2 === 'jus' ? 'selected' : ''}>Jus</option>
+                        <option value="eau" ${invite.boisson2 === 'eau' ? 'selected' : ''}>Eau</option>
+                        <option value="soda" ${invite.boisson2 === 'soda' ? 'selected' : ''}>Soda</option>
                     </select>
                     <textarea id="message" class="swal2-textarea" placeholder="Message livre d'or">${invite.message || ''}</textarea>
                 `,
@@ -363,11 +369,13 @@
                     invites[index] = {
                         ...invite,
                         nom: document.getElementById('nom').value.trim(),
+                        evenementId: parseInt(document.getElementById('evenementId').value) || null,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
                         email: document.getElementById('email').value,
                         telephone: document.getElementById('telephone').value,
-                        tableId: parseInt(document.getElementById('tableId').value) || null,
                         confirmation: document.getElementById('confirmation').value,
-                        boisson: document.getElementById('boisson').value,
+                        boisson1: document.getElementById('boisson1').value,
+                        boisson2: document.getElementById('boisson2').value,
                         message: document.getElementById('message').value
                     };
                     sauvegarder();
@@ -383,13 +391,13 @@
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Oui, supprimer',
+                confirmButtonText: 'Oui',
                 cancelButtonText: 'Annuler'
             }).then((result) => {
                 if (result.isConfirmed) {
                     invites.splice(index, 1);
                     sauvegarder();
-                    Swal.fire('Supprimé!', 'Invité supprimé avec succès', 'success');
+                    Swal.fire('Supprimé!', 'Invité supprimé', 'success');
                 }
             });
         }
@@ -397,19 +405,19 @@
         function envoyerWhatsApp(index) {
             const invite = invites[index];
             const lien = genererLienInvitation(invite.id);
-            const message = `Bonjour ${invite.nom},\n\nVous êtes invité(e) au mariage de Guelor & Naomie le 07/03/2026.\n\nCliquez sur ce lien pour confirmer votre présence :\n${lien}`;
+            const message = `Bonjour ${invite.nom},\n\nVous êtes invité(e) au mariage. Cliquez sur ce lien :\n${lien}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
         }
         
         function envoyerEmail(index) {
             const invite = invites[index];
             if (!invite.email) {
-                Swal.fire('Erreur', 'Aucune adresse email renseignée', 'error');
+                Swal.fire('Erreur', 'Aucune adresse email', 'error');
                 return;
             }
             const lien = genererLienInvitation(invite.id);
-            const sujet = "Invitation au mariage de Guelor & Naomie";
-            const corps = `Bonjour ${invite.nom},\n\nNous avons le plaisir de vous inviter à notre mariage qui aura lieu le 07/03/2026.\n\nCliquez sur ce lien pour confirmer votre présence et laisser un message :\n${lien}\n\nAu plaisir de vous voir,\nGuelor & Naomie`;
+            const sujet = "Invitation à notre mariage";
+            const corps = `Bonjour ${invite.nom},\n\nVoici votre invitation : ${lien}`;
             window.location.href = `mailto:${invite.email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
         }
         
@@ -417,19 +425,22 @@
             const invite = invites[index];
             const lien = genererLienInvitation(invite.id);
             navigator.clipboard.writeText(lien).then(() => {
-                Swal.fire('Copié!', 'Lien copié dans le presse-papier', 'success');
-            }).catch(() => {
-                Swal.fire('Erreur', 'Impossible de copier le lien', 'error');
+                Swal.fire('Copié!', 'Lien copié', 'success');
             });
         }
         
-        // Remplir le filtre des tables
+        // Remplir les filtres
+        const filtreEvenement = document.getElementById('filtreEvenement');
         const filtreTable = document.getElementById('filtreTable');
+        
+        evenements.forEach(e => {
+            filtreEvenement.innerHTML += `<option value="${e.id}">${e.nom}</option>`;
+        });
+        
         tables.forEach(t => {
             filtreTable.innerHTML += `<option value="${t.id}">${t.nom}</option>`;
         });
         
-        // Initialisation
         afficherInvites();
     </script>
 </body>
