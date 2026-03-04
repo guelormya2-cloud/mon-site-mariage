@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Gestion des événements</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des événements - Equinoxe Events</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -11,10 +11,8 @@
         :root {
             --gold: #D4AF37;
             --dark-gold: #B8860B;
-            --mariage: #e83e8c;
-            --bapteme: #17a2b8;
-            --anniversaire: #28a745;
-            --autre: #6c757d;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
         }
         
         body {
@@ -63,15 +61,6 @@
             padding: 15px;
         }
         
-        .event-type-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            color: white;
-            font-size: 0.8rem;
-            margin-left: 10px;
-        }
-        
         .event-image {
             width: 100%;
             height: 200px;
@@ -100,15 +89,6 @@
             border-radius: 8px;
         }
         
-        .info-item {
-            margin-bottom: 10px;
-        }
-        
-        .info-item label {
-            font-weight: 600;
-            color: var(--dark-gray);
-        }
-        
         .badge-actif {
             background-color: #28a745;
             color: white;
@@ -123,17 +103,26 @@
             border-radius: 4px;
         }
         
-        .message-personnalise {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
+        .badge-passe {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         @media (max-width: 768px) {
-            .container { padding: 10px; }
-            .event-image { height: 150px; }
-            .btn { width: 100%; margin-bottom: 5px; }
+            .container {
+                padding: 10px;
+            }
+            
+            .event-image {
+                height: 150px;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -148,29 +137,29 @@
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
         let photoBase64 = '';
         
+        if (evenements.length === 0) {
+            evenements = [
+                {
+                    id: 1,
+                    nom: "Mariage Guelor & Naomie",
+                    type: "mariage",
+                    date: "2026-03-07",
+                    heure: "19:00",
+                    lieu: "GLORIOUS PALACE",
+                    adresse: "Av. Mvunda 21, Kinshasa",
+                    telephone: "+243 82 124 8030",
+                    email: "guelormuya2@gmail.com",
+                    photo: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80",
+                    messagePersonnalise: "Nous sommes heureux de vous compter parmi nous !",
+                    archive: false
+                }
+            ];
+            localStorage.setItem('evenements', JSON.stringify(evenements));
+        }
+
         function sauvegarder() {
             localStorage.setItem('evenements', JSON.stringify(evenements));
             afficherEvenements();
-        }
-        
-        function getEventColor(type) {
-            const colors = {
-                'mariage': '#e83e8c',
-                'bapteme': '#17a2b8',
-                'anniversaire': '#28a745',
-                'autre': '#6c757d'
-            };
-            return colors[type] || '#D4AF37';
-        }
-        
-        function getEventIcon(type) {
-            const icons = {
-                'mariage': 'fas fa-heart',
-                'bapteme': 'fas fa-dove',
-                'anniversaire': 'fas fa-birthday-cake',
-                'autre': 'fas fa-calendar-check'
-            };
-            return icons[type] || 'fas fa-calendar';
         }
     </script>
 
@@ -238,32 +227,22 @@
                 if (estArchive) {
                     badgeClass = 'badge-archive';
                     badgeTexte = 'Archivé';
+                } else if (estPasse) {
+                    badgeClass = 'badge-passe';
+                    badgeTexte = 'Passé';
                 }
-                
-                const eventColor = getEventColor(event.type);
-                const eventIcon = getEventIcon(event.type);
                 
                 container.innerHTML += `
                     <div class="col-md-6 mb-4">
                         <div class="event-card">
                             <div class="event-header">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="mb-0">
-                                        <i class="${eventIcon} me-2"></i>
-                                        ${event.nom}
-                                    </h5>
+                                    <h5 class="mb-0">${event.nom}</h5>
                                     <span class="badge ${badgeClass}">${badgeTexte}</span>
                                 </div>
-                                <div class="mt-2">
-                                    <span class="event-type-badge" style="background-color: ${eventColor}">
-                                        <i class="${eventIcon} me-1"></i>
-                                        ${event.type || 'Mariage'}
-                                    </span>
-                                </div>
                             </div>
-                            <img src="${event.photo || 'https://via.placeholder.com/800x400?text=Photo+non+disponible'}" 
-                                 class="event-image" alt="${event.nom}" 
-                                 onerror="this.src='https://via.placeholder.com/800x400?text=Photo+non+disponible'">
+                            <img src="${event.photo || 'https://via.placeholder.com/800x400?text=Photo'}" 
+                                 class="event-image" alt="${event.nom}">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-6">
@@ -275,12 +254,6 @@
                                         <p><i class="fas fa-phone me-2 text-gold"></i>${event.telephone}</p>
                                     </div>
                                 </div>
-                                ${event.messagePersonnalise ? `
-                                    <div class="message-personnalise">
-                                        <i class="fas fa-quote-left text-gold me-2"></i>
-                                        ${event.messagePersonnalise}
-                                    </div>
-                                ` : ''}
                                 <div class="d-flex gap-2 mt-3">
                                     <button class="btn btn-sm btn-outline-primary flex-fill" onclick="modifierEvenement(${index})">
                                         <i class="fas fa-edit me-1"></i>Modifier
@@ -312,8 +285,8 @@
             Swal.fire({
                 title: 'Nouvel événement',
                 html: `
-                    <input type="text" id="nom" class="swal2-input" placeholder="Nom de l'événement" value="Nouvel événement">
-                    <select id="type" class="swal2-select" style="width:100%; margin-bottom:10px;">
+                    <input type="text" id="nom" class="swal2-input" placeholder="Nom de l'événement">
+                    <select id="type" class="swal2-input">
                         <option value="mariage">💍 Mariage</option>
                         <option value="bapteme">🕊️ Baptême</option>
                         <option value="anniversaire">🎂 Anniversaire</option>
@@ -322,35 +295,15 @@
                     <input type="date" id="date" class="swal2-input" value="${new Date().toISOString().split('T')[0]}">
                     <input type="time" id="heure" class="swal2-input" value="19:00">
                     <input type="text" id="lieu" class="swal2-input" placeholder="Lieu">
-                    <textarea id="adresse" class="swal2-textarea" placeholder="Adresse complète"></textarea>
+                    <textarea id="adresse" class="swal2-textarea" placeholder="Adresse"></textarea>
                     <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
                     <input type="email" id="email" class="swal2-input" placeholder="Email">
-                    <textarea id="message" class="swal2-textarea" placeholder="Message personnalisé pour les invités (optionnel)"></textarea>
-                    <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
-                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                        <p>Cliquez pour choisir une photo</p>
-                        <input type="file" id="photoFile" accept="image/*" style="display: none;">
-                    </div>
-                    <img id="photoPreview" class="photo-preview" style="display: none;">
+                    <textarea id="message" class="swal2-textarea" placeholder="Message personnalisé"></textarea>
                 `,
                 confirmButtonText: 'Créer',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
-                didOpen: () => {
-                    document.getElementById('photoFile').addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                document.getElementById('photoPreview').src = e.target.result;
-                                document.getElementById('photoPreview').style.display = 'block';
-                                photoBase64 = e.target.result;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                },
                 preConfirm: () => {
                     const nom = document.getElementById('nom').value.trim();
                     if (!nom) {
@@ -369,9 +322,8 @@
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
                         messagePersonnalise: document.getElementById('message').value,
-                        photo: photoBase64 || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-                        archive: false,
-                        dateCreation: new Date().toISOString()
+                        photo: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                        archive: false
                     });
                     sauvegarder();
                 }
@@ -380,13 +332,12 @@
         
         function modifierEvenement(index) {
             const event = evenements[index];
-            photoBase64 = event.photo;
             
             Swal.fire({
                 title: 'Modifier l\'événement',
                 html: `
                     <input type="text" id="nom" class="swal2-input" value="${event.nom}">
-                    <select id="type" class="swal2-select" style="width:100%; margin-bottom:10px;">
+                    <select id="type" class="swal2-input">
                         <option value="mariage" ${event.type === 'mariage' ? 'selected' : ''}>💍 Mariage</option>
                         <option value="bapteme" ${event.type === 'bapteme' ? 'selected' : ''}>🕊️ Baptême</option>
                         <option value="anniversaire" ${event.type === 'anniversaire' ? 'selected' : ''}>🎂 Anniversaire</option>
@@ -398,31 +349,12 @@
                     <textarea id="adresse" class="swal2-textarea">${event.adresse || ''}</textarea>
                     <input type="tel" id="telephone" class="swal2-input" value="${event.telephone || ''}">
                     <input type="email" id="email" class="swal2-input" value="${event.email || ''}">
-                    <textarea id="message" class="swal2-textarea" placeholder="Message personnalisé">${event.messagePersonnalise || ''}</textarea>
-                    <div class="photo-upload-area" onclick="document.getElementById('photoFile').click()">
-                        <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                        <p>Cliquez pour changer la photo</p>
-                        <input type="file" id="photoFile" accept="image/*" style="display: none;">
-                    </div>
-                    <img id="photoPreview" class="photo-preview" src="${event.photo}" style="display: block;">
+                    <textarea id="message" class="swal2-textarea">${event.messagePersonnalise || ''}</textarea>
                 `,
                 confirmButtonText: 'Modifier',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
-                didOpen: () => {
-                    document.getElementById('photoFile').addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                document.getElementById('photoPreview').src = e.target.result;
-                                photoBase64 = e.target.result;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                },
                 preConfirm: () => {
                     evenements[index] = {
                         ...event,
@@ -434,8 +366,7 @@
                         adresse: document.getElementById('adresse').value,
                         telephone: document.getElementById('telephone').value,
                         email: document.getElementById('email').value,
-                        messagePersonnalise: document.getElementById('message').value,
-                        photo: photoBase64 || event.photo
+                        messagePersonnalise: document.getElementById('message').value
                     };
                     sauvegarder();
                 }
@@ -448,8 +379,7 @@
                 ...event,
                 id: Date.now(),
                 nom: event.nom + ' (copie)',
-                archive: false,
-                dateCreation: new Date().toISOString()
+                archive: false
             };
             evenements.push(nouveauEvent);
             sauvegarder();

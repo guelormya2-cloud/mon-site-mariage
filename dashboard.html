@@ -2,49 +2,85 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Tableau de Bord - Gestion Mariage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - Événement</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <link rel="icon" type="image/png" href="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" />
+    <meta property="og:title" content="Mariage de Guelor et Naomie">
+    <meta property="og:description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+    <meta property="og:image" content="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mariage de Guelor et Naomie">
+    <meta name="twitter:description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+    <meta name="twitter:image" content="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg">
+    <meta name="description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+    <meta name="author" content="Innovatech">
+    <meta name="csrf-token" content="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05">
     <style>
         :root {
             --gold: #D4AF37;
             --dark-gold: #B8860B;
             --black: #000000;
             --dark-gray: #2c2c2c;
+            --light-beige: #f8f5f0;
+            --white: #ffffff;
         }
         
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #f8f9fa;
+            color: var(--dark-gray);
         }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--black);
+        }
+        
+        .text-gold { color: var(--gold) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+        .bg-light-custom { background-color: var(--light-beige) !important; }
         
         .navbar {
             background: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
-            padding: 15px 0;
         }
         
         .navbar-brand {
-            color: var(--gold) !important;
             font-family: 'Playfair Display', serif;
             font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        .nav-link {
-            color: white !important;
+            color: var(--gold) !important;
         }
         
         .event-header {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1600&q=80');
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 2rem 0;
+            padding: 3rem 0;
             margin-bottom: 2rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--dark-gray);
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: transparent;
+            color: var(--gold);
+            border-bottom: 3px solid var(--gold);
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            color: var(--dark-gold);
+            background-color: rgba(212, 175, 55, 0.1);
         }
         
         .stat-card {
@@ -52,27 +88,95 @@
             border-radius: 8px;
             transition: transform 0.3s ease;
             height: 100%;
-            background: white;
-            padding: 20px;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
+        }
+        
+        .guest-card {
+            border-left: 4px solid var(--gold);
+            transition: all 0.3s ease;
+        }
+        
+        .guest-card:hover {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--gold);
+        .badge-confirmed {
+            background-color: #28a745;
+        }
+        
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .badge-cancelled {
+            background-color: #dc3545;
+        }
+        
+        .table-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .table-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .guestbook-card {
+            border-left: 4px solid var(--gold);
+            background-color: var(--light-beige);
+        }
+        
+        .mobile-guest-row {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .event-header {
+                padding: 2rem 0;
+            }
+            
+            .display-4 {
+                font-size: 2rem;
+            }
+            
+            .desktop-guest-table {
+                display: none;
+            }
+            
+            .mobile-guest-row {
+                display: block;
+            }
+            
+            .mobile-guest-card {
+                margin-bottom: 1rem;
+                border-left: 4px solid var(--gold);
+            }
+            
+            .mobile-guest-info {
+                font-size: 0.9rem;
+            }
+            
+            .mobile-guest-actions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
         }
         
         .btn-gold {
             background-color: var(--gold);
             border-color: var(--gold);
             color: white;
-            padding: 12px;
-            font-weight: 600;
         }
         
         .btn-gold:hover {
@@ -81,59 +185,202 @@
             color: white;
         }
         
-        .menu-card {
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .pagination-js .page-link {
+            color: var(--dark-gray);
+            border: 1px solid #dee2e6;
+            min-width: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-js .page-item.active .page-link {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .pagination-js .page-link:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            border-color: var(--gold);
+        }
+        
+        .pagination-js .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .pagination-row {
+            display: none;
+        }
+        
+        .pagination-row.visible {
+            display: table-row;
+        }
+        
+        .pagination-card {
+            display: none;
+        }
+        
+        .pagination-card.visible {
+            display: block;
+        }
+        
+        .page-ellipsis {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.375rem 0.75rem;
+            color: #6c757d;
+            pointer-events: none;
+        }
+        
+        .pagination-info {
+            text-align: center;
+            margin-top: 10px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .stat-details {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .capacity-alert {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .capacity-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .capacity-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .capacity-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .event-card {
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            height: 100%;
+            margin-bottom: 20px;
             background: white;
+            overflow: hidden;
         }
         
-        .menu-card:hover {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            transform: translateY(-5px);
+        .event-header-card {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 15px;
         }
         
-        .menu-card i {
-            transition: all 0.3s ease;
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
         }
         
-        .menu-card:hover i {
-            transform: scale(1.1);
-        }
-        
-        .card {
+        .photo-upload-area {
+            border: 2px dashed #ced4da;
             border-radius: 8px;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 15px;
         }
         
-        /* Styles pour mobile */
+        .photo-upload-area:hover {
+            border-color: var(--gold);
+        }
+        
+        .photo-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        
+        .badge-actif {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        
+        .badge-archive {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .invitation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
         @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 1.2rem;
+            .invitation-header {
+                flex-direction: column;
+                align-items: stretch;
             }
-            
-            .event-header {
-                padding: 1.5rem 0;
+            .invitation-header h4 {
+                text-align: center;
             }
-            
-            .event-header h1 {
-                font-size: 1.8rem;
+            .download-btn {
+                width: 100%;
             }
-            
-            .menu-card {
-                margin-bottom: 15px;
-            }
-            
-            .stat-card {
-                margin-bottom: 15px;
-            }
-            
-            .btn-gold {
-                padding: 10px;
-                font-size: 0.9rem;
+        }
+
+        @media (min-width: 769px) {
+            .download-btn {
+                width: auto;
             }
         }
     </style>
@@ -145,7 +392,17 @@
                 window.location.href = 'login.html';
             }
         })();
-        
+
+        let currentDesktopPage = 1;
+        let currentMobilePage = 1;
+        let itemsPerPage = 10;
+        let totalItems = 118;
+        let totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        let invites = JSON.parse(localStorage.getItem('invites')) || [];
+        let tables = JSON.parse(localStorage.getItem('tables')) || [];
+        let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
+
         function logout() {
             Swal.fire({
                 title: 'Déconnexion',
@@ -164,27 +421,196 @@
                 }
             });
         }
+
+        function initPagination() {
+            const rows = document.querySelectorAll('.pagination-row');
+            const cards = document.querySelectorAll('.pagination-card');
+            
+            rows.forEach(row => row.style.display = 'none');
+            cards.forEach(card => card.style.display = 'none');
+            
+            showPage(1, 'desktop');
+            showPage(1, 'mobile');
+            
+            if (totalItems > itemsPerPage) {
+                createPagination('desktopPaginationContainer', totalPages, 'desktop');
+                createPagination('mobilePaginationContainer', totalPages, 'mobile');
+            }
+            
+            updatePaginationInfo(1, 'desktop');
+            updatePaginationInfo(1, 'mobile');
+        }
+
+        function showPage(page, type) {
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            
+            if (type === 'desktop') {
+                currentDesktopPage = page;
+                const rows = document.querySelectorAll('.pagination-row');
+                
+                rows.forEach(row => row.style.display = 'none');
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    if (rows[i]) rows[i].style.display = 'table-row';
+                }
+                
+                updatePaginationInfo(page, 'desktop');
+            } else {
+                currentMobilePage = page;
+                const cards = document.querySelectorAll('.pagination-card');
+                
+                cards.forEach(card => card.style.display = 'none');
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    if (cards[i]) cards[i].style.display = 'block';
+                }
+                
+                updatePaginationInfo(page, 'mobile');
+            }
+        }
+
+        function updatePaginationInfo(page, type) {
+            const start = (page - 1) * itemsPerPage + 1;
+            const end = Math.min(page * itemsPerPage, totalItems);
+            
+            if (type === 'desktop') {
+                document.getElementById('desktopStart').textContent = start;
+                document.getElementById('desktopEnd').textContent = end;
+                document.getElementById('desktopTotal').textContent = totalItems;
+            } else {
+                document.getElementById('mobileStart').textContent = start;
+                document.getElementById('mobileEnd').textContent = end;
+                document.getElementById('mobileTotal').textContent = totalItems;
+            }
+        }
+
+        function createPagination(containerId, totalPages, type) {
+            const container = document.getElementById(containerId);
+            if (!container || totalPages <= 1) return;
+            
+            container.innerHTML = '';
+            
+            const nav = document.createElement('nav');
+            const ul = document.createElement('ul');
+            ul.className = 'pagination pagination-js';
+            
+            const prevLi = document.createElement('li');
+            prevLi.className = 'page-item' + ((type === 'desktop' && currentDesktopPage === 1) || (type === 'mobile' && currentMobilePage === 1) ? ' disabled' : '');
+            const prevLink = document.createElement('a');
+            prevLink.className = 'page-link';
+            prevLink.href = '#';
+            prevLink.innerHTML = '&laquo;';
+            prevLink.onclick = (e) => {
+                e.preventDefault();
+                if (type === 'desktop' && currentDesktopPage > 1) {
+                    showPage(currentDesktopPage - 1, 'desktop');
+                    createPagination(containerId, totalPages, 'desktop');
+                } else if (type === 'mobile' && currentMobilePage > 1) {
+                    showPage(currentMobilePage - 1, 'mobile');
+                    createPagination(containerId, totalPages, 'mobile');
+                }
+            };
+            prevLi.appendChild(prevLink);
+            ul.appendChild(prevLi);
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const li = document.createElement('li');
+                li.className = 'page-item' + ((type === 'desktop' && currentDesktopPage === i) || (type === 'mobile' && currentMobilePage === i) ? ' active' : '');
+                const link = document.createElement('a');
+                link.className = 'page-link';
+                link.href = '#';
+                link.textContent = i;
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    showPage(i, type);
+                    createPagination(containerId, totalPages, type);
+                };
+                li.appendChild(link);
+                ul.appendChild(li);
+            }
+            
+            const nextLi = document.createElement('li');
+            nextLi.className = 'page-item' + ((type === 'desktop' && currentDesktopPage === totalPages) || (type === 'mobile' && currentMobilePage === totalPages) ? ' disabled' : '');
+            const nextLink = document.createElement('a');
+            nextLink.className = 'page-link';
+            nextLink.href = '#';
+            nextLink.innerHTML = '&raquo;';
+            nextLink.onclick = (e) => {
+                e.preventDefault();
+                if (type === 'desktop' && currentDesktopPage < totalPages) {
+                    showPage(currentDesktopPage + 1, 'desktop');
+                    createPagination(containerId, totalPages, 'desktop');
+                } else if (type === 'mobile' && currentMobilePage < totalPages) {
+                    showPage(currentMobilePage + 1, 'mobile');
+                    createPagination(containerId, totalPages, 'mobile');
+                }
+            };
+            nextLi.appendChild(nextLink);
+            ul.appendChild(nextLi);
+            
+            nav.appendChild(ul);
+            container.appendChild(nav);
+        }
+
+        function setupCopyButtons() {
+            const copyButtons = document.querySelectorAll('.copy-link-btn');
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const link = this.getAttribute('data-link');
+                    
+                    navigator.clipboard.writeText(link)
+                        .then(() => {
+                            Swal.fire({
+                                title: 'Succès!',
+                                text: 'Le lien a été copié dans le presse-papier.',
+                                icon: 'success',
+                                confirmButtonColor: '#D4AF37',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                title: 'Erreur!',
+                                text: 'Impossible de copier le lien.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        });
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initPagination();
+            setupCopyButtons();
+        });
     </script>
 
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Gestion Mariage</a>
-            <div class="collapse navbar-collapse">
+            <a class="navbar-brand" href="#">Equinoxe Events</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="dashboard.html">
-                            <i class="fas fa-home me-1"></i>Accueil
-                        </a>
+                        <a class="nav-link active" href="#"><i class="fas fa-home me-1"></i>Tableau de bord</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="archives.html">
-                            <i class="fas fa-archive me-1"></i>Archives
-                        </a>
+                        <a class="nav-link" href="gestion-evenements.html"><i class="fas fa-calendar me-1"></i>Événements</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)" onclick="logout()">
-                            <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
-                        </a>
+                        <a class="nav-link" href="gestion-tables.html"><i class="fas fa-chair me-1"></i>Tables</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestion-invites.html"><i class="fas fa-users me-1"></i>Invitations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" onclick="logout()"><i class="fas fa-sign-out-alt me-1"></i>Déconnexion</a>
                     </li>
                 </ul>
             </div>
@@ -193,78 +619,342 @@
 
     <div class="event-header">
         <div class="container">
-            <h1 class="display-4 text-gold">Tableau de bord</h1>
-            <p class="lead">Gérez vos événements depuis votre ordinateur ou mobile</p>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 text-gold">Mariage de Guelor et Naomie</h1>
+                    <p class="lead">07/03/2026 • salle de fête GLORIOUS PALACE</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="bg-gold text-dark d-inline-block px-3 py-2 rounded">
+                        <small>Code événement:</small>
+                        <div class="h5 mb-0">EVT-EOMHSGHU</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="container mb-5">
-        <!-- Cartes de navigation -->
-        <div class="row mb-4">
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card menu-card" onclick="window.location.href='gestion-evenements.html'">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-calendar-alt fa-3x text-gold mb-3"></i>
-                        <h4>Événements</h4>
-                        <p class="text-muted small">Créer, modifier, gérer les événements</p>
+        <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">
+                    <i class="fas fa-chart-pie me-2"></i>Tableau de bord
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="guests-tab" data-bs-toggle="tab" data-bs-target="#guests" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Invitations
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tables-tab" data-bs-toggle="tab" data-bs-target="#tables" type="button" role="tab">
+                    <i class="fas fa-chair me-2"></i>Plans de table
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="guestbook-tab" data-bs-toggle="tab" data-bs-target="#guestbook" type="button" role="tab">
+                    <i class="fas fa-book me-2"></i>Livre d'or
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="eventTabsContent">
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                <div class="row mb-4">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-gold mb-2">
+                                    <i class="fas fa-envelope fa-2x"></i>
+                                </div>
+                                <div class="stat-number">118</div>
+                                <p class="card-text">Invitations émises</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-success mb-2">
+                                    <i class="fas fa-check-circle fa-2x"></i>
+                                </div>
+                                <div class="stat-number">7</div>
+                                <p class="card-text">Invitations confirmées</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-warning mb-2">
+                                    <i class="fas fa-clock fa-2x"></i>
+                                </div>
+                                <div class="stat-number">111</div>
+                                <p class="card-text">Invitations en attente</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="card stat-card shadow-sm">
+                            <div class="card-body text-center">
+                                <div class="text-info mb-2">
+                                    <i class="fas fa-book fa-2x"></i>
+                                </div>
+                                <div class="stat-number">8</div>
+                                <p class="card-text">Messages livre d'or</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Résumé</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <ul class="list-unstyled">
+                                                <li><strong>Total invitations:</strong> 118</li>
+                                                <li><strong>Total personnes:</strong> 183</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Détails de l'événement</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Date:</strong> 07/03/2026</p>
+                                        <p><strong>Heure:</strong> 19:00 - 04:00</p>
+                                        <p><strong>Lieu:</strong> salle de fête GLORIOUS PALACE</p>
+                                        <p><strong>Adresse:</strong> Av. Mvunda 21 Q/yolo-nord C/Kalamu - Réf. Hopital rond point yolo Médical</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Organisé par:</strong> mulamba</p>
+                                        <p><strong>Contact:</strong> service.client.innovatech@gmail.com</p>
+                                        <p><strong>Téléphone:</strong> 0821248030</p>
+                                        <p><strong>Adresse:</strong> Kikwit2, Num 17, mazamba, kinshasa</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <h6>Message d'invitation:</h6>
+                                    <p class="text-muted">Les familles Lupulu et Mokongo ont le réel plaisir de vous inviter au Mariage Civil et Coutumier de leurs enfants; Guelor et Naomie.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Image de l'événement</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" 
+                                     alt="Mariage" class="img-fluid rounded">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card menu-card" onclick="window.location.href='gestion-tables.html'">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-chair fa-3x text-gold mb-3"></i>
-                        <h4>Tables</h4>
-                        <p class="text-muted small">Gérer les tables et leurs capacités</p>
+
+            <div class="tab-pane fade" id="guests" role="tabpanel">
+                <div class="invitation-header mb-4">
+                    <h4>
+                        Gestion des Invitations
+                        <span class="stats">
+                            (118 invitations / 183 personnes)
+                        </span>
+                    </h4>
+
+                    <a class="btn btn-gold download-btn"
+                       href="https://www.equinoxe-events.com/invites/download/mariage-de-guelor-et-naomie-913272599075035261">
+                        <i class="fas fa-file-csv me-1"></i> Télécharger
+                    </a>
+                </div>
+
+                <div class="desktop-guest-table">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="guestsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Invitation</th>
+                                            <th>Email</th>
+                                            <th>Téléphone</th>
+                                            <th>Statut</th>
+                                            <th>Table</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="desktopGuestsBody">
+                                        <tr class="pagination-row" data-index="0">
+                                            <td>
+                                                <strong>Couple Marie & MISENGA</strong>
+                                                <br><small class="text-info">(2 personnes)</small>
+                                            </td>
+                                            <td>vincentndebwany@gmail.com</td>
+                                            <td>836963894</td>
+                                            <td>
+                                                <span class="badge badge-pending">Envoyee</span>
+                                            </td>
+                                            <td>Table MAYONNAISE</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
+                                                <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
+                                                <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                                <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div class="pagination-info" id="desktopPaginationInfo">
+                                    Affichage de <span id="desktopStart">1</span> à <span id="desktopEnd">10</span> sur <span id="desktopTotal">118</span> invitations
+                                </div>
+                                
+                                <div class="pagination-container" id="desktopPaginationContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-guest-row">
+                    <div id="mobileGuestsBody">
+                        <div class="card mobile-guest-card pagination-card" data-index="0">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-0">Couple Marie & MISENGA</h6>
+                                        <small class="text-info">(2 personnes)</small>
+                                    </div>
+                                    <span class="badge badge-pending">Envoyee</span>
+                                </div>
+                                
+                                <div class="mobile-guest-info mb-3">
+                                    <div class="text-muted small">
+                                        <div><i class="fas fa-envelope me-1"></i> vincentndebwany@gmail.com</div>
+                                        <div><i class="fas fa-phone me-1"></i> 836963894</div>
+                                        <div><i class="fas fa-chair me-1"></i> Table MAYONNAISE</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mobile-guest-actions">
+                                    <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
+                                    <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
+                                    <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                    <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pagination-info" id="mobilePaginationInfo">
+                        Affichage de <span id="mobileStart">1</span> à <span id="mobileEnd">10</span> sur <span id="mobileTotal">118</span> invitations
+                    </div>
+                    
+                    <div class="pagination-container" id="mobilePaginationContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tables" role="tabpanel">
+                <h4 class="mb-4">Plans de Table</h4>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="card table-card shadow-sm h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">Table : LA TEAM</h5>
+                                <small class="text-muted">Capacité: 100 personnes</small>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Mr LA TEAM</li>
+                                    <li class="list-group-item">Mr FAMILLE</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    <strong>2/100 places occupées</strong><br>
+                                    2 invitation(s) sur cette table
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card table-card shadow-sm h-100">
+                            <div class="card-header">
+                                <h5 class="mb-0">Table : MAYONNAISE</h5>
+                                <small class="text-muted">Capacité: 100 personnes</small>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Couple Marie & MISENGA <span class="badge bg-info ms-2">2 personnes</span></li>
+                                    <li class="list-group-item">Mme MA BLANDINE</li>
+                                    <li class="list-group-item">Mr FAMILLE</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    <strong>4/100 places occupées</strong><br>
+                                    3 invitation(s) sur cette table
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card menu-card" onclick="window.location.href='gestion-invites.html'">
-                    <div class="card-body text-center p-4">
-                        <i class="fas fa-users fa-3x text-gold mb-3"></i>
-                        <h4>Invités</h4>
-                        <p class="text-muted small">Gérer les invités et envoyer les invitations</p>
-                    </div>
+
+            <div class="tab-pane fade" id="guestbook" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Livre d'Or</h4>
+                    
+                    <a href="#" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-download"></i> Télécharger
+                    </a>
                 </div>
-            </div>
-        </div>
         
-        <!-- Statistiques -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-white">
-                        <h4 class="mb-0"><i class="fas fa-chart-pie text-gold me-2"></i>Statistiques</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="stat-number" id="totalEvenements">0</div>
-                                <p class="text-muted small">Événements</p>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-number" id="totalTables">0</div>
-                                <p class="text-muted small">Tables</p>
-                            </div>
-                            <div class="col-4">
-                                <div class="stat-number" id="totalInvites">0</div>
-                                <p class="text-muted small">Invit</p>
-                            </div>
-                        </div>
-                        <div class="row text-center mt-3">
-                            <div class="col-6">
-                                <div class="stat-number" id="totalActifs">0</div>
-                                <p class="text-muted small">Événements actifs</p>
-                            </div>
-                            <div class="col-6">
-                                <div class="stat-number" id="totalArchives">0</div>
-                                <p class="text-muted small">Archives</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col">Invité</th>
+                                <th scope="col">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Couple Andy</td>
+                                <td>"Heureux mariage"</td>
+                            </tr>
+                            <tr>
+                                <td>Couple MUDIMBI</td>
+                                <td>"Heureux mariage à vous !"</td>
+                            </tr>
+                            <tr>
+                                <td>Mr MUTOMBO</td>
+                                <td>"Merci pour l'honneur, félicitations !"</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -272,29 +962,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    
-    <script>
-        function mettreAJourStats() {
-            try {
-                const evenements = JSON.parse(localStorage.getItem('evenements')) || [];
-                const aujourdhui = new Date().toISOString().split('T')[0];
-                
-                const actifs = evenements.filter(e => e.date >= aujourdhui && !e.archive);
-                const archives = evenements.filter(e => e.date < aujourdhui || e.archive);
-                const tables = JSON.parse(localStorage.getItem('tables')) || [];
-                const invites = JSON.parse(localStorage.getItem('invites')) || [];
-                
-                document.getElementById('totalEvenements').textContent = evenements.length;
-                document.getElementById('totalTables').textContent = tables.length;
-                document.getElementById('totalInvites').textContent = invites.length;
-                document.getElementById('totalActifs').textContent = actifs.length;
-                document.getElementById('totalArchives').textContent = archives.length;
-            } catch (e) {
-                console.log('Erreur de chargement des stats');
-            }
-        }
-        
-        mettreAJourStats();
-    </script>
 </body>
 </html>

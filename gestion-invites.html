@@ -6,69 +6,33 @@
     <title>Gestion des invités - Equinoxe Events</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         :root {
             --gold: #D4AF37;
             --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-color: #f8f9fa;
         }
         
         .navbar {
             background: linear-gradient(135deg, #000 0%, #2c2c2c 100%);
-            padding: 15px;
             margin-bottom: 20px;
         }
         
         .navbar-brand {
             color: var(--gold) !important;
-            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
         }
         
-        .guest-card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .guest-header {
-            background: var(--gold);
-            color: white;
-            padding: 15px;
-        }
-        
-        .message-exact {
-            background: #f0f0f0;
-            padding: 20px;
-            margin: 15px;
-            border-radius: 8px;
-            border-left: 4px solid var(--gold);
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .link-box {
-            background: #e9ecef;
-            padding: 10px;
-            border-radius: 5px;
-            word-break: break-all;
-            margin: 10px 0;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 5px;
-            padding: 0 15px 15px 15px;
-        }
-        
-        .btn-group button {
-            flex: 1;
+        .nav-link {
+            color: white !important;
         }
         
         .btn-gold {
@@ -79,135 +43,410 @@
         
         .btn-gold:hover {
             background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+        }
+        
+        .guest-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        
+        .guest-header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .badge-confirme { background-color: #28a745; color: white; padding: 5px 10px; border-radius: 4px; }
+        .badge-attente { background-color: #ffc107; color: black; padding: 5px 10px; border-radius: 4px; }
+        .badge-refuse { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 4px; }
+        
+        .btn-group {
+            gap: 5px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .btn-group { flex-direction: column; }
+            .btn-group .btn { width: 100%; margin-bottom: 5px; }
         }
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="container">
-            <span class="navbar-brand">Equinoxe Events - Gestion des invités</span>
-            <a href="dashboard.html" class="text-white">Retour</a>
-        </div>
-    </div>
-
-    <div class="container">
-        <div id="invitesList"></div>
-    </div>
-
     <script>
-        // Récupérer les données
+        (function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        })();
+
         let invites = JSON.parse(localStorage.getItem('invites')) || [];
+        let tables = JSON.parse(localStorage.getItem('tables')) || [];
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
 
         function genererIdUnique() {
-            return Math.random().toString(36).substring(2, 15).toUpperCase() + 
-                   Math.random().toString(36).substring(2, 15).toUpperCase();
+            return 'INV-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
         }
 
         function genererLienInvitation(invite) {
-            if (!invite.lienId) {
-                invite.lienId = genererIdUnique();
-                sauvegarder();
-            }
-            
+            const baseUrl = window.location.origin + window.location.pathname.replace('gestion-invites.html', 'invitation.html');
             const evenement = evenements.find(e => e.id === invite.evenementId) || {};
+            const table = tables.find(t => t.id === invite.tableId) || {};
             
             const data = {
+                id: invite.id,
                 nom: invite.nom,
-                evenementNom: evenement.nom || 'Événement',
-                evenementDate: evenement.date || '07/03/2026',
-                evenementHeure: evenement.heure || '19:00',
-                evenementLieu: evenement.lieu || 'GLORIOUS PALACE',
-                evenementAdresse: evenement.adresse || 'Av. Mvunda 21, Kinshasa',
-                evenementTelephone: evenement.telephone || '+243 82 124 8030',
-                evenementEmail: evenement.email || 'guelormuya2@gmail.com',
-                evenementPhoto: evenement.photo || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                civilite: invite.civilite || '',
+                email: invite.email || '',
+                telephone: invite.telephone || '',
+                boisson1: invite.boisson1 || '',
+                boisson2: invite.boisson2 || '',
+                message: invite.message || '',
+                statut: invite.statut || 'attente',
+                tableNom: table.nom || '',
+                evenementNom: evenement.nom || '',
+                evenementType: evenement.type || 'mariage',
+                evenementDate: evenement.date || '',
+                evenementHeure: evenement.heure || '',
+                evenementLieu: evenement.lieu || '',
+                evenementAdresse: evenement.adresse || '',
+                evenementTelephone: evenement.telephone || '',
+                evenementEmail: evenement.email || '',
+                evenementPhoto: evenement.photo || '',
                 evenementMessage: evenement.messagePersonnalise || ''
             };
             
             const dataStr = btoa(JSON.stringify(data));
-            
-            // Retourner le lien complet
-            return `https://guelormya2-cloud.github.io/mon-site-mariage/invitation.html?data=${encodeURIComponent(dataStr)}`;
-        }
-
-        function genererMessageExact(invite, lien) {
-            return `${invite.nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :\n${lien}`;
+            return `${baseUrl}?data=${encodeURIComponent(dataStr)}`;
         }
 
         function sauvegarder() {
             localStorage.setItem('invites', JSON.stringify(invites));
             afficherInvites();
         }
+    </script>
 
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestion des invités</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-arrow-left me-1"></i>Retour
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="filters">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <select class="form-select" id="filtreEvenement" onchange="afficherInvites()">
+                        <option value="">Tous les événements</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtreTable" onchange="afficherInvites()">
+                        <option value="">Toutes les tables</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="filtreStatut" onchange="afficherInvites()">
+                        <option value="">Tous les statuts</option>
+                        <option value="confirme">Confirmés</option>
+                        <option value="attente">En attente</option>
+                        <option value="refuse">Refusés</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-gold w-100" onclick="ajouterInvite()">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="invitesContainer"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    
+    <script>
         function afficherInvites() {
-            const container = document.getElementById('invitesList');
+            const container = document.getElementById('invitesContainer');
+            const filtreEvenement = document.getElementById('filtreEvenement').value;
+            const filtreTable = document.getElementById('filtreTable').value;
+            const filtreStatut = document.getElementById('filtreStatut').value;
+            
+            let invitesFiltres = invites;
+            
+            if (filtreEvenement) invitesFiltres = invitesFiltres.filter(i => i.evenementId == filtreEvenement);
+            if (filtreTable) invitesFiltres = invitesFiltres.filter(i => i.tableId == filtreTable);
+            if (filtreStatut) invitesFiltres = invitesFiltres.filter(i => i.statut === filtreStatut);
+            
             container.innerHTML = '';
             
-            if (invites.length === 0) {
-                container.innerHTML = '<div class="alert alert-info">Aucun invité pour le moment</div>';
+            if (invitesFiltres.length === 0) {
+                container.innerHTML = `<div class="text-center py-5"><i class="fas fa-users fa-4x text-muted mb-3"></i><h5>Aucun invité trouvé</h5></div>`;
                 return;
             }
             
-            invites.forEach(invite => {
+            invitesFiltres.forEach((invite) => {
+                const table = tables.find(t => t.id === invite.tableId);
+                const evenement = evenements.find(e => e.id === invite.evenementId);
+                
+                let badgeClass = 'badge-attente';
+                let badgeTexte = 'En attente';
+                
+                if (invite.statut === 'confirme') {
+                    badgeClass = 'badge-confirme';
+                    badgeTexte = 'Confirmé';
+                } else if (invite.statut === 'refuse') {
+                    badgeClass = 'badge-refuse';
+                    badgeTexte = 'Refusé';
+                }
+                
                 const lien = genererLienInvitation(invite);
-                const message = genererMessageExact(invite, lien);
                 
                 container.innerHTML += `
                     <div class="guest-card">
                         <div class="guest-header">
-                            <h5 class="mb-0">${invite.nom}</h5>
-                        </div>
-                        <div class="p-3">
-                            <p><strong>Email:</strong> ${invite.email || '-'}</p>
-                            <p><strong>Téléphone:</strong> ${invite.telephone || '-'}</p>
-                            
-                            <div class="message-exact">
-                                ${message.replace(/\n/g, '<br>')}
-                            </div>
-                            
-                            <div class="link-box">
-                                <i class="fas fa-link me-2" style="color: var(--gold);"></i>
-                                ${lien}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">${invite.civilite ? invite.civilite + ' ' : ''}${invite.nom}</h5>
+                                <span class="${badgeClass}">${badgeTexte}</span>
                             </div>
                         </div>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-success" onclick="envoyerWhatsApp('${encodeURIComponent(message)}')">
-                                <i class="fab fa-whatsapp"></i> WhatsApp
-                            </button>
-                            <button class="btn btn-sm btn-primary" onclick="envoyerEmail('${invite.email}', '${encodeURIComponent(message)}')">
-                                <i class="fas fa-envelope"></i> Email
-                            </button>
-                            <button class="btn btn-sm btn-secondary" onclick="copierMessage('${encodeURIComponent(message)}')">
-                                <i class="fas fa-copy"></i> Copier
-                            </button>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><i class="fas fa-calendar me-2 text-gold"></i>${evenement ? evenement.nom : 'Événement?'}</p>
+                                    <p><i class="fas fa-chair me-2 text-gold"></i>${table ? table.nom : 'Non assigné'}</p>
+                                    <p><i class="fas fa-envelope me-2 text-gold"></i>${invite.email || '-'}</p>
+                                    <p><i class="fas fa-phone me-2 text-gold"></i>${invite.telephone || '-'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Boissons:</strong> ${invite.boisson1 || '-'} / ${invite.boisson2 || '-'}</p>
+                                    <p class="fst-italic">"${invite.message || 'Aucun message'}"</p>
+                                </div>
+                            </div>
+                            <div class="btn-group w-100 mt-2">
+                                <button class="btn btn-sm btn-outline-success" onclick="window.open('https://wa.me/?text=' + encodeURIComponent('${invite.nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous :\n${lien}'))">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="window.location.href='mailto:${invite.email}?subject=Invitation&body=' + encodeURIComponent('${invite.nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous :\n${lien}')">
+                                    <i class="fas fa-envelope"></i> Email
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('${lien}').then(()=>alert('Lien copié!'))">
+                                    <i class="fas fa-link"></i> Copier
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="modifierInvite(${invite.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="supprimerInvite(${invite.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
         }
 
-        function envoyerWhatsApp(messageEncoded) {
-            const message = decodeURIComponent(messageEncoded);
-            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-        }
-
-        function envoyerEmail(email, messageEncoded) {
-            if (!email) {
-                alert('Email manquant pour cet invité');
-                return;
-            }
-            const message = decodeURIComponent(messageEncoded);
-            window.location.href = `mailto:${email}?subject=Votre invitation&body=${encodeURIComponent(message)}`;
-        }
-
-        function copierMessage(messageEncoded) {
-            const message = decodeURIComponent(messageEncoded);
-            navigator.clipboard.writeText(message).then(() => {
-                alert('Message copié dans le presse-papier!');
+        function ajouterInvite() {
+            let evenementOptions = '<option value="">Choisir un événement</option>';
+            let tableOptions = '<option value="">Choisir une table</option>';
+            
+            evenements.forEach(e => {
+                evenementOptions += `<option value="${e.id}">${e.nom}</option>`;
+            });
+            
+            tables.forEach(t => {
+                tableOptions += `<option value="${t.id}">${t.nom}</option>`;
+            });
+            
+            Swal.fire({
+                title: 'Nouvel invité',
+                html: `
+                    <select id="civilite" class="swal2-input">
+                        <option value="M.">Monsieur</option>
+                        <option value="Mme">Madame</option>
+                        <option value="Mlle">Mademoiselle</option>
+                        <option value="Couple">Couple</option>
+                        <option value="Famille">Famille</option>
+                    </select>
+                    <input type="text" id="nom" class="swal2-input" placeholder="Nom complet" required>
+                    <select id="evenementId" class="swal2-input">${evenementOptions}</select>
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
+                    <input type="email" id="email" class="swal2-input" placeholder="Email">
+                    <input type="tel" id="telephone" class="swal2-input" placeholder="Téléphone">
+                    <select id="boisson1" class="swal2-input">
+                        <option value="">Boisson 1</option>
+                        <option value="COCA">Coca</option>
+                        <option value="FANTA">Fanta</option>
+                        <option value="VITALO">Vitalo</option>
+                        <option value="MALTINA">Maltina</option>
+                    </select>
+                    <select id="boisson2" class="swal2-input">
+                        <option value="">Boisson 2</option>
+                        <option value="BAVARIA">Bavaria</option>
+                        <option value="BEAUFORT">Beaufort</option>
+                        <option value="CASTAL">Castal</option>
+                        <option value="NKOY">Nkoy</option>
+                    </select>
+                    <select id="statut" class="swal2-input">
+                        <option value="attente">En attente</option>
+                        <option value="confirme">Confirmé</option>
+                        <option value="refuse">Refusé</option>
+                    </select>
+                `,
+                confirmButtonText: 'Créer',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const nom = document.getElementById('nom').value.trim();
+                    if (!nom) {
+                        Swal.showValidationMessage('Nom requis');
+                        return false;
+                    }
+                    
+                    invites.push({
+                        id: genererIdUnique(),
+                        civilite: document.getElementById('civilite').value,
+                        nom: nom,
+                        evenementId: parseInt(document.getElementById('evenementId').value) || null,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
+                        email: document.getElementById('email').value,
+                        telephone: document.getElementById('telephone').value,
+                        boisson1: document.getElementById('boisson1').value,
+                        boisson2: document.getElementById('boisson2').value,
+                        statut: document.getElementById('statut').value,
+                        message: ''
+                    });
+                    sauvegarder();
+                }
             });
         }
 
+        function modifierInvite(id) {
+            const invite = invites.find(i => i.id === id);
+            if (!invite) return;
+            
+            let evenementOptions = '<option value="">Choisir un événement</option>';
+            let tableOptions = '<option value="">Choisir une table</option>';
+            
+            evenements.forEach(e => {
+                const selected = e.id === invite.evenementId ? 'selected' : '';
+                evenementOptions += `<option value="${e.id}" ${selected}>${e.nom}</option>`;
+            });
+            
+            tables.forEach(t => {
+                const selected = t.id === invite.tableId ? 'selected' : '';
+                tableOptions += `<option value="${t.id}" ${selected}>${t.nom}</option>`;
+            });
+            
+            Swal.fire({
+                title: 'Modifier invité',
+                html: `
+                    <select id="civilite" class="swal2-input">
+                        <option value="M." ${invite.civilite === 'M.' ? 'selected' : ''}>Monsieur</option>
+                        <option value="Mme" ${invite.civilite === 'Mme' ? 'selected' : ''}>Madame</option>
+                        <option value="Mlle" ${invite.civilite === 'Mlle' ? 'selected' : ''}>Mademoiselle</option>
+                        <option value="Couple" ${invite.civilite === 'Couple' ? 'selected' : ''}>Couple</option>
+                        <option value="Famille" ${invite.civilite === 'Famille' ? 'selected' : ''}>Famille</option>
+                    </select>
+                    <input type="text" id="nom" class="swal2-input" value="${invite.nom}">
+                    <select id="evenementId" class="swal2-input">${evenementOptions}</select>
+                    <select id="tableId" class="swal2-input">${tableOptions}</select>
+                    <input type="email" id="email" class="swal2-input" value="${invite.email || ''}">
+                    <input type="tel" id="telephone" class="swal2-input" value="${invite.telephone || ''}">
+                    <select id="boisson1" class="swal2-input">
+                        <option value="">Boisson 1</option>
+                        <option value="COCA" ${invite.boisson1 === 'COCA' ? 'selected' : ''}>Coca</option>
+                        <option value="FANTA" ${invite.boisson1 === 'FANTA' ? 'selected' : ''}>Fanta</option>
+                        <option value="VITALO" ${invite.boisson1 === 'VITALO' ? 'selected' : ''}>Vitalo</option>
+                        <option value="MALTINA" ${invite.boisson1 === 'MALTINA' ? 'selected' : ''}>Maltina</option>
+                    </select>
+                    <select id="boisson2" class="swal2-input">
+                        <option value="">Boisson 2</option>
+                        <option value="BAVARIA" ${invite.boisson2 === 'BAVARIA' ? 'selected' : ''}>Bavaria</option>
+                        <option value="BEAUFORT" ${invite.boisson2 === 'BEAUFORT' ? 'selected' : ''}>Beaufort</option>
+                        <option value="CASTAL" ${invite.boisson2 === 'CASTAL' ? 'selected' : ''}>Castal</option>
+                        <option value="NKOY" ${invite.boisson2 === 'NKOY' ? 'selected' : ''}>Nkoy</option>
+                    </select>
+                    <select id="statut" class="swal2-input">
+                        <option value="attente" ${invite.statut === 'attente' ? 'selected' : ''}>En attente</option>
+                        <option value="confirme" ${invite.statut === 'confirme' ? 'selected' : ''}>Confirmé</option>
+                        <option value="refuse" ${invite.statut === 'refuse' ? 'selected' : ''}>Refusé</option>
+                    </select>
+                    <textarea id="message" class="swal2-textarea" placeholder="Message">${invite.message || ''}</textarea>
+                `,
+                confirmButtonText: 'Modifier',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const index = invites.findIndex(i => i.id === id);
+                    invites[index] = {
+                        ...invite,
+                        civilite: document.getElementById('civilite').value,
+                        nom: document.getElementById('nom').value.trim(),
+                        evenementId: parseInt(document.getElementById('evenementId').value) || null,
+                        tableId: parseInt(document.getElementById('tableId').value) || null,
+                        email: document.getElementById('email').value,
+                        telephone: document.getElementById('telephone').value,
+                        boisson1: document.getElementById('boisson1').value,
+                        boisson2: document.getElementById('boisson2').value,
+                        statut: document.getElementById('statut').value,
+                        message: document.getElementById('message').value
+                    };
+                    sauvegarder();
+                }
+            });
+        }
+
+        function supprimerInvite(id) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: 'Supprimer cet invité ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Oui'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    invites = invites.filter(i => i.id !== id);
+                    sauvegarder();
+                    Swal.fire('Supprimé!', 'Invité supprimé', 'success');
+                }
+            });
+        }
+
+        const filtreEvenement = document.getElementById('filtreEvenement');
+        const filtreTable = document.getElementById('filtreTable');
+        
+        evenements.forEach(e => {
+            filtreEvenement.innerHTML += `<option value="${e.id}">${e.nom}</option>`;
+        });
+        
+        tables.forEach(t => {
+            filtreTable.innerHTML += `<option value="${t.id}">${t.nom}</option>`;
+        });
+        
         afficherInvites();
     </script>
 </body>
