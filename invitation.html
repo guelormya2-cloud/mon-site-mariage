@@ -6,21 +6,34 @@
     <title>Invitation - Equinoxe Events</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+            --light-beige: #f8f5f0;
+        }
+        
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .invitation-container {
-            max-width: 800px;
+            max-width: 600px;
+            width: 100%;
             margin: 0 auto;
         }
         
-        .card {
+        .invitation-card {
             background: white;
             border-radius: 20px;
             overflow: hidden;
@@ -29,102 +42,153 @@
         
         .photo-section {
             width: 100%;
-            height: 400px;
+            height: 300px;
             background-size: cover;
             background-position: center;
+            border-bottom: 5px solid var(--gold);
         }
         
         .content-section {
             padding: 30px;
         }
         
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            color: #D4AF37;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .guest-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
         }
         
         .special-message {
-            font-size: 1.2em;
-            color: #666;
-            text-align: center;
+            font-size: 1.2rem;
+            color: var(--gold);
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed var(--gold);
+        }
+        
+        .invitation-text {
+            background: var(--light-beige);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.8;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .invitation-link {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #0066cc;
             margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #D4AF37;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .info-item {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .info-item i {
-            font-size: 2rem;
-            color: #D4AF37;
-            margin-bottom: 10px;
+            border: 1px solid #ddd;
         }
         
         .btn-download {
-            background: #D4AF37;
+            background: var(--gold);
             color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 50px;
             width: 100%;
             font-size: 1.1em;
-            font-weight: bold;
+            font-weight: 600;
             margin: 20px 0;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .btn-download:hover {
-            background: #B8860B;
+            background: var(--dark-gold);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
         }
         
-        .btn-download i {
-            margin-right: 10px;
+        .event-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .detail-item i {
+            width: 30px;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        
+        .detail-item strong {
+            margin-right: 5px;
+            color: var(--dark-gray);
         }
         
         .contact-info {
-            background: #333;
+            background: var(--black);
             color: white;
             padding: 20px;
             border-radius: 10px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         
         .contact-info a {
-            color: #D4AF37;
+            color: var(--gold);
             text-decoration: none;
         }
         
+        .contact-info i {
+            color: var(--gold);
+            margin-right: 10px;
+        }
+        
+        .footer-logo {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+        
+        .footer-logo span {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
             .photo-section {
-                height: 250px;
+                height: 200px;
             }
-            .header h1 {
-                font-size: 2em;
+            
+            .guest-name {
+                font-size: 1.8rem;
             }
+            
             .content-section {
                 padding: 20px;
+            }
+            
+            .invitation-text {
+                padding: 15px;
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -137,70 +201,53 @@
         </div>
         
         <div id="content" style="display: none;"></div>
+        
+        <div id="error" style="display: none;">
+            <div class="invitation-card">
+                <div class="content-section text-center py-5">
+                    <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
+                    <h3>Invitation non trouvée</h3>
+                    <p class="text-muted">Le lien que vous avez utilisé n'est pas valide.</p>
+                    <p class="mt-3">Veuillez contacter l'organisateur pour obtenir un nouveau lien.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Récupérer l'ID du lien depuis l'URL
-        const pathParts = window.location.pathname.split('/');
-        const lienId = pathParts[pathParts.length - 1].split('?')[0];
+        // Récupérer les données de l'URL
         const urlParams = new URLSearchParams(window.location.search);
         const dataStr = urlParams.get('data');
         
         if (!dataStr) {
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').innerHTML = `
-                <div class="card">
-                    <div class="content-section text-center py-5">
-                        <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
-                        <h3>Invitation non trouvée</h3>
-                        <p>Le lien que vous avez utilisé n'est pas valide.</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('content').style.display = 'block';
+            document.getElementById('error').style.display = 'block';
         } else {
             try {
                 const data = JSON.parse(atob(decodeURIComponent(dataStr)));
                 
+                // URL complète pour l'affichage
+                const fullUrl = window.location.href;
+                
                 document.getElementById('loading').style.display = 'none';
                 
                 document.getElementById('content').innerHTML = `
-                    <div class="card">
-                        <div class="photo-section" style="background-image: url('${data.evenementPhoto}')"></div>
+                    <div class="invitation-card">
+                        <div class="photo-section" style="background-image: url('${data.evenementPhoto || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80'}')"></div>
                         
                         <div class="content-section">
-                            <div class="header">
-                                <h1>${data.evenementNom}</h1>
-                            </div>
+                            <div class="guest-name">${data.nom}</div>
                             
                             <div class="special-message">
-                                <i class="fas fa-star text-gold me-2"></i>
-                                ${data.nom}, vous êtes notre invité(e) spécial(e)
+                                <i class="fas fa-star me-2"></i>
+                                Vous êtes notre invité(e) spécial(e)
                             </div>
                             
-                            ${data.evenementMessage ? `
-                                <div class="alert alert-info">
-                                    <i class="fas fa-quote-left me-2"></i>
-                                    ${data.evenementMessage}
-                                </div>
-                            ` : ''}
-                            
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <i class="fas fa-calendar"></i>
-                                    <h4>Date</h4>
-                                    <p>${data.evenementDate}</p>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-clock"></i>
-                                    <h4>Heure</h4>
-                                    <p>${data.evenementHeure}</p>
-                                </div>
-                                <div class="info-item">
-                                    <i class="fas fa-map-marker"></i>
-                                    <h4>Lieu</h4>
-                                    <p>${data.evenementLieu}</p>
-                                    <small>${data.evenementAdresse}</small>
+                            <div class="invitation-text">
+                                <p class="mb-2">Cliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :</p>
+                                <div class="invitation-link">
+                                                    <i class="fas fa-link me-2" style="color: var(--gold);"></i>
+                                    ${fullUrl}
                                 </div>
                             </div>
                             
@@ -209,21 +256,45 @@
                                 Télécharger mon invitation
                             </button>
                             
-                            <div class="contact-info">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h5><i class="fas fa-phone-alt me-2"></i>Contact</h5>
-                                        <p><a href="tel:${data.evenementTelephone}">${data.evenementTelephone}</a></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5><i class="fas fa-envelope me-2"></i>Email</h5>
-                                        <p><a href="mailto:${data.evenementEmail}">${data.evenementEmail}</a></p>
-                                    </div>
+                            <div class="event-details">
+                                <h5 class="mb-3"><i class="fas fa-calendar-alt me-2" style="color: var(--gold);"></i>Détails de l'événement</h5>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <div><strong>Date :</strong> ${data.evenementDate || '07/03/2026'}</div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div><strong>Heure :</strong> ${data.evenementHeure || '19:00'}</div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <div><strong>Lieu :</strong> ${data.evenementLieu || 'GLORIOUS PALACE'}</div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <i class="fas fa-location-dot"></i>
+                                    <div><strong>Adresse :</strong> ${data.evenementAdresse || 'Av. Mvunda 21, Kinshasa'}</div>
                                 </div>
                             </div>
                             
-                            <div class="text-center mt-3 text-muted small">
-                                Lien: ${window.location.href}
+                            ${data.evenementMessage ? `
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-quote-left me-2" style="color: var(--gold);"></i>
+                                    ${data.evenementMessage}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="contact-info">
+                                <h5 class="mb-3"><i class="fas fa-phone-alt"></i>Contact organisateur</h5>
+                                <p><i class="fas fa-phone"></i> <a href="tel:${data.evenementTelephone || '+243821248030'}">${data.evenementTelephone || '+243 82 124 8030'}</a></p>
+                                <p><i class="fas fa-envelope"></i> <a href="mailto:${data.evenementEmail || 'guelormuya2@gmail.com'}">${data.evenementEmail || 'guelormuya2@gmail.com'}</a></p>
+                            </div>
+                            
+                            <div class="footer-logo">
+                                Invitation envoyée via <span>Equinoxe Events</span>
                             </div>
                         </div>
                     </div>
@@ -231,26 +302,21 @@
                 document.getElementById('content').style.display = 'block';
                 
             } catch (e) {
+                console.error('Erreur:', e);
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').innerHTML = `
-                    <div class="card">
-                        <div class="content-section text-center py-5">
-                            <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
-                            <h3>Erreur de chargement</h3>
-                            <p>Impossible de charger l'invitation.</p>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('content').style.display = 'block';
+                document.getElementById('error').style.display = 'block';
             }
         }
         
         function telechargerInvitation() {
-            // Créer une version PDF ou image de l'invitation
-            const element = document.querySelector('.card');
-            const nom = document.querySelector('.special-message').textContent.split(',')[0];
+            // Créer un élément canvas pour capturer l'invitation
+            const element = document.querySelector('.invitation-card');
             
-            alert('Fonctionnalité de téléchargement à venir. Pour l\'instant, vous pouvez prendre une capture d\'écran.');
+            // Option 1: Guide pour capture d'écran
+            alert('Pour télécharger votre invitation :\n\n1. Faites une capture d\'écran (Volume bas + Power sur Android)\n2. Ou utilisez l\'impression PDF (Menu > Imprimer > Enregistrer au format PDF)');
+            
+            // Option 2: Ouvrir la boîte de dialogue d'impression
+            // window.print();
         }
     </script>
 </body>
