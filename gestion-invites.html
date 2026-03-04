@@ -2,137 +2,272 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Gestion des invités</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Vos styles existants */
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #B8860B;
+            --black: #000000;
+            --dark-gray: #2c2c2c;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #000 0%, #2c2c2c 100%);
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        
+        .navbar-brand {
+            color: var(--gold) !important;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        
+        .nav-link {
+            color: white !important;
+        }
+        
+        .btn-gold {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: white;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--dark-gold);
+            border-color: var(--dark-gold);
+            color: white;
+        }
+        
+        .guest-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .guest-header {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .guest-header h5 {
+            margin: 0;
+            color: white;
+        }
+        
+        .message-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--gold);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .link-example {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            word-break: break-all;
+            color: #0066cc;
+        }
+        
+        .btn-group {
+            gap: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn-group .btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
     <script>
-        // Récupérer les données du localStorage
+        (function() {
+            if (localStorage.getItem('isLoggedIn') !== 'true') {
+                window.location.href = 'login.html';
+            }
+        })();
+
         let invites = JSON.parse(localStorage.getItem('invites')) || [];
         let evenements = JSON.parse(localStorage.getItem('evenements')) || [];
-        let tables = JSON.parse(localStorage.getItem('tables')) || [];
+        
+        function sauvegarder() {
+            localStorage.setItem('invites', JSON.stringify(invites));
+            afficherInvites();
+        }
 
+        // Générer un ID unique pour le lien (comme dans votre exemple)
+        function genererIdLien() {
+            return Math.random().toString(36).substring(2, 15).toUpperCase() + 
+                   Math.random().toString(36).substring(2, 15).toUpperCase();
+        }
+
+        // Créer le message personnalisé pour l'invité
+        function genererMessageInvitation(invite, lien) {
+            return `${invite.nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :\n${lien}`;
+        }
+
+        // Générer le lien d'invitation
         function genererLienInvitation(invite) {
-            // Récupérer l'événement et la table associés
-            const evenement = evenements.find(e => e.id === invite.evenementId) || {};
-            const table = tables.find(t => t.id === invite.tableId) || {};
+            if (!invite.lienId) {
+                invite.lienId = genererIdLien();
+                sauvegarder();
+            }
             
-            // Créer l'objet avec toutes les données
+            const evenement = evenements.find(e => e.id === invite.evenementId) || {};
+            
+            // Encoder toutes les données dans l'URL
             const data = {
                 id: invite.id,
                 nom: invite.nom,
-                email: invite.email || '',
-                telephone: invite.telephone || '',
-                boisson1: invite.boisson1 || '',
-                boisson2: invite.boisson2 || '',
-                message: invite.message || '',
-                confirmation: invite.confirmation || 'non',
-                tableNom: table.nom || '',
-                evenementNom: evenement.nom || '',
-                evenementType: evenement.type || 'mariage',
+                evenementNom: evenement.nom || 'Événement',
                 evenementDate: evenement.date || '',
                 evenementHeure: evenement.heure || '',
                 evenementLieu: evenement.lieu || '',
                 evenementAdresse: evenement.adresse || '',
-                evenementTelephone: evenement.telephone || '',
-                evenementEmail: evenement.email || '',
                 evenementPhoto: evenement.photo || '',
-                evenementMessage: evenement.messagePersonnalise || ''
+                evenementMessage: evenement.messagePersonnalise || '',
+                boisson1: invite.boisson1 || '',
+                boisson2: invite.boisson2 || '',
+                message: invite.message || '',
+                confirmation: invite.confirmation || 'non'
             };
             
-            // Encoder les données en base64 pour un lien plus court
             const dataStr = btoa(JSON.stringify(data));
             
-            // Retourner le lien
-            return `${window.location.origin}/mon-site-mariage/invitation.html?data=${encodeURIComponent(dataStr)}`;
+            // Format du lien comme dans votre exemple
+            return `https://www.equinoxe-events.com/invitation/${invite.lienId}?data=${encodeURIComponent(dataStr)}`;
         }
+    </script>
 
-        // Fonction pour copier le lien
-        function copierLien(lien) {
-            navigator.clipboard.writeText(lien).then(() => {
-                alert('Lien copié !');
-            });
-        }
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestion des invités</a>
+            <div>
+                <a class="nav-link d-inline" href="dashboard.html">Retour</a>
+            </div>
+        </div>
+    </nav>
 
-        // Fonction pour envoyer par WhatsApp
-        function envoyerWhatsApp(lien, nom) {
-            const message = `Bonjour ${nom}, voici votre invitation : ${lien}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
-        }
+    <div class="container mt-4">
+        <h2 class="mb-4">Liste des invités</h2>
+        
+        <div id="invitesContainer"></div>
+    </div>
 
-        // Fonction pour envoyer par email
-        function envoyerEmail(email, lien, nom) {
-            if (!email) {
-                alert('Email manquant');
-                return;
-            }
-            const sujet = "Votre invitation";
-            const corps = `Bonjour ${nom},\n\nCliquez sur ce lien pour voir votre invitation : ${lien}`;
-            window.location.href = `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
-        }
-
-        // Afficher la liste des invités
+    <script>
         function afficherInvites() {
             const container = document.getElementById('invitesContainer');
             container.innerHTML = '';
             
+            if (invites.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Aucun invité pour le moment</div>';
+                return;
+            }
+            
             invites.forEach(invite => {
-                const evenement = evenements.find(e => e.id === invite.evenementId) || { nom: 'Inconnu' };
+                const evenement = evenements.find(e => e.id === invite.evenementId) || { nom: 'Événement' };
                 const lien = genererLienInvitation(invite);
+                const message = genererMessageInvitation(invite, lien);
                 
                 container.innerHTML += `
-                    <div class="card mb-3">
+                    <div class="guest-card">
+                        <div class="guest-header">
+                            <h5><i class="fas fa-user me-2"></i>${invite.nom}</h5>
+                        </div>
                         <div class="card-body">
-                            <h5>${invite.nom}</h5>
-                            <p>Événement: ${evenement.nom}</p>
-                            <p>Statut: ${invite.confirmation || 'Non confirmé'}</p>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-success" onclick="envoyerWhatsApp('${lien}', '${invite.nom}')">WhatsApp</button>
-                                <button class="btn btn-sm btn-primary" onclick="envoyerEmail('${invite.email}', '${lien}', '${invite.nom}')">Email</button>
-                                <button class="btn btn-sm btn-secondary" onclick="copierLien('${lien}')">Copier</button>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Événement:</strong> ${evenement.nom}</p>
+                                    <p><strong>Email:</strong> ${invite.email || '-'}</p>
+                                    <p><strong>Téléphone:</strong> ${invite.telephone || '-'}</p>
+                                    <p><strong>Statut:</strong> 
+                                        <span class="badge ${invite.confirmation === 'oui' ? 'bg-success' : invite.confirmation === 'refuse' ? 'bg-danger' : 'bg-warning'}">
+                                            ${invite.confirmation || 'En attente'}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Boissons:</strong></p>
+                                    <ul>
+                                        <li>1er choix: ${invite.boisson1 || '-'}</li>
+                                        <li>2ème choix: ${invite.boisson2 || '-'}</li>
+                                    </ul>
+                                    ${invite.message ? `<p><strong>Message:</strong> "${invite.message}"</p>` : ''}
+                                </div>
                             </div>
-                            <small class="text-muted d-block mt-2">Lien: ${lien.substring(0, 50)}...</small>
+                            
+                            <div class="message-preview">
+                                <strong>Message à envoyer :</strong><br>
+                                ${message.replace(/\n/g, '<br>')}
+                            </div>
+                            
+                            <div class="link-example mb-3">
+                                <i class="fas fa-link me-2"></i>
+                                ${lien}
+                            </div>
+                            
+                            <div class="btn-group w-100">
+                                <button class="btn btn-sm btn-success" onclick="envoyerWhatsApp('${encodeURIComponent(message)}')">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </button>
+                                <button class="btn btn-sm btn-primary" onclick="envoyerEmail('${invite.email}', '${encodeURIComponent(message)}')">
+                                    <i class="fas fa-envelope"></i> Email
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="copierMessage('${encodeURIComponent(message)}')">
+                                    <i class="fas fa-copy"></i> Copier
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
         }
-
-        // Ajouter un nouvel invité
-        function ajouterInvite() {
-            const nom = prompt("Nom de l'invité:");
-            if (!nom) return;
-            
-            const evenementId = prompt("ID de l'événement:");
-            
-            invites.push({
-                id: Date.now(),
-                nom: nom,
-                evenementId: evenementId ? parseInt(evenementId) : null,
-                email: '',
-                telephone: '',
-                boisson1: '',
-                boisson2: '',
-                message: '',
-                confirmation: 'non'
-            });
-            
-            localStorage.setItem('invites', JSON.stringify(invites));
-            afficherInvites();
+        
+        function envoyerWhatsApp(messageEncoded) {
+            const message = decodeURIComponent(messageEncoded);
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
         }
-
-        window.onload = afficherInvites;
+        
+        function envoyerEmail(email, messageEncoded) {
+            if (!email) {
+                alert('Email manquant pour cet invité');
+                return;
+            }
+            const message = decodeURIComponent(messageEncoded);
+            window.location.href = `mailto:${email}?subject=Votre invitation&body=${encodeURIComponent(message)}`;
+        }
+        
+        function copierMessage(messageEncoded) {
+            const message = decodeURIComponent(messageEncoded);
+            navigator.clipboard.writeText(message).then(() => {
+                alert('Message copié dans le presse-papier!');
+            });
+        }
+        
+        afficherInvites();
     </script>
-
-    <div class="container mt-4">
-        <h1>Gestion des invités</h1>
-        <button class="btn btn-primary mb-3" onclick="ajouterInvite()">Ajouter un invité</button>
-        <div id="invitesContainer"></div>
-    </div>
 </body>
 </html>
