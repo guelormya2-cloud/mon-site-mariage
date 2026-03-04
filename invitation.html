@@ -2,322 +2,1083 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Invitation - Equinoxe Events</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitation Mariage de Guelor et Naomie</title>
+
+    <!-- Favicon (photo de l'événement) -->
+    <link rel="icon" type="image/png" href="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" />
+    
+    <!-- Métas Open Graph -->
+    <meta property="og:title" content="Mariage de Guelor et Naomie">
+    <meta property="og:description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+    <meta property="og:image" content="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg">
+    <meta property="og:url" content="https://www.equinoxe-events.com/invitation/ZH2QB0PQKHM2T9DYTS7MEYKOICBSKJFP">
+    <meta property="og:type" content="website">
+
+    <!-- Métas Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mariage de Guelor et Naomie">
+    <meta name="twitter:description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+    <meta name="twitter:image" content="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg">
+    <meta name="twitter:url" content="https://www.equinoxe-events.com/invitation/ZH2QB0PQKHM2T9DYTS7MEYKOICBSKJFP">
+
+    <!-- Description pour SEO -->
+    <meta name="description" content="Nous vous souhaitons la bienvenue dans notre Mariage">
+
+    <!-- Auteur -->
+    <meta name="author" content="Innovatech">
+
+    <!-- Polices -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@300;400;500&display=swap">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
     <style>
         :root {
-            --gold: #D4AF37;
-            --dark-gold: #B8860B;
-            --black: #000000;
-            --dark-gray: #2c2c2c;
-            --light-beige: #f8f5f0;
+            --ivory: #f9f5f0;
+            --taupe: #8b6b5e;
+            --beige: #d8c4b6;
+            --sand: #a37b5a;
+            --charcoal: #4a3f35;
+            --gold: #c8a97e;
+            --gold-light: #e6d6c1;
+            --white: #ffffff;
+            --rose: #f8d7da;
+            --rose-gold: #b76e79;
+            --dark-overlay: rgba(74, 63, 53, 0.85);
+            --red-overlay: rgba(183, 110, 121, 0.8);
         }
-        
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+
+        * {
             margin: 0;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .invitation-container {
-            max-width: 600px;
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: linear-gradient(135deg, var(--ivory) 0%, var(--gold-light) 100%);
+            color: var(--charcoal);
+            overflow-x: hidden;
+            line-height: 1.6;
+            background-attachment: fixed;
+        }
+
+        /* Pluie de pétales élégante */
+        .petals-background {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            margin: 0 auto;
-        }
-        
-        .invitation-card {
-            background: white;
-            border-radius: 20px;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
-        .photo-section {
+
+        .petal {
+            position: absolute;
+            top: -50px;
+            font-size: 18px;
+            animation: fall linear infinite;
+            opacity: 0.5;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Image principale */
+        .couple-main-image {
             width: 100%;
-            height: 300px;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .couple-main-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                rgba(74, 63, 53, 0.2) 0%,
+                rgba(74, 63, 53, 0.5) 100%);
+            z-index: 1;
+        }
+
+        /* Couche rougeâtre en bas */
+        .red-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to top, 
+                var(--red-overlay) 0%,
+                rgba(183, 110, 121, 0.4) 70%,
+                transparent 100%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 60px;
+        }
+
+        .couple-main-image img {
+            width: 100%;
+            height: 100vh;
+            object-fit: cover;
+            display: block;
+        }
+
+        .event-title {
+            color: var(--white);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-align: center;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .event-subtitle {
+            color: var(--white);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: center;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
+            font-style: italic;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        /* Contenu de l'invitation */
+        .invitation-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Sections avec margins */
+        .section-container {
+            position: relative;
+            padding: 2rem 1.5rem;
+            background: var(--dark-overlay);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(200, 169, 126, 0.3);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .section-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
             background-size: cover;
             background-position: center;
-            border-bottom: 5px solid var(--gold);
+            filter: blur(20px) brightness(0.7);
+            z-index: -2;
+            transform: scale(1.1);
         }
-        
-        .content-section {
-            padding: 30px;
+
+        /* Bordures décoratives */
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            opacity: 0.7;
+            margin:20px;
         }
-        
-        .guest-name {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--black);
-            margin-bottom: 5px;
-            font-family: 'Playfair Display', serif;
+
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-top: 2px solid var(--gold);
+            border-left: 2px solid var(--gold);
         }
-        
-        .special-message {
+
+        .corner-tr {
+            top: 0;
+            right: 0;
+            border-top: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+        }
+
+        .corner-bl {
+            bottom: 0;
+            left: 0;
+            border-bottom: 2px solid var(--gold);
+            border-left: 2px solid var(--gold);
+        }
+
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-bottom: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+        }
+
+        /* Typographie */
+        .guest-info h3 {
+            font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
-            color: var(--gold);
-            font-weight: 500;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed var(--gold);
-        }
-        
-        .invitation-text {
-            background: var(--light-beige);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 1rem;
-            line-height: 1.8;
-            border-left: 4px solid var(--gold);
-        }
-        
-        .invitation-link {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #0066cc;
-            margin: 20px 0;
-            border: 1px solid #ddd;
-        }
-        
-        .btn-download {
-            background: var(--gold);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            width: 100%;
-            font-size: 1.1em;
-            font-weight: 600;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-download:hover {
-            background: var(--dark-gold);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        .event-details {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        
-        .detail-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .detail-item i {
-            width: 30px;
-            color: var(--gold);
-            font-size: 1.2rem;
-        }
-        
-        .detail-item strong {
-            margin-right: 5px;
-            color: var(--dark-gray);
-        }
-        
-        .contact-info {
-            background: var(--black);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .contact-info a {
-            color: var(--gold);
-            text-decoration: none;
-        }
-        
-        .contact-info i {
-            color: var(--gold);
-            margin-right: 10px;
-        }
-        
-        .footer-logo {
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-weight: 400;
+            letter-spacing: 1px;
             text-align: center;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.8);
-            font-size: 0.9rem;
         }
-        
-        .footer-logo span {
-            color: var(--gold);
+
+        #guestName {
             font-weight: 600;
+            color: var(--gold);
         }
-        
+
+        .couple-names {
+            margin: 1rem 0;
+            position: relative;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        .couple-names::before, .couple-names::after {
+            content: "✦";
+            position: absolute;
+            color: var(--gold);
+            font-size: 1.4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.8;
+        }
+
+        .couple-names::before {
+            top: 0;
+        }
+
+        .couple-names::after {
+            bottom: 0;
+        }
+
+        .couple-names p {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.8rem;
+            color: var(--white);
+            margin: 0.8rem 0;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            line-height: 1.1;
+        }
+
+        .couple-names span {
+            font-size: 1.8rem;
+            color: var(--gold);
+            display: inline-block;
+            margin: 0 1rem;
+            font-style: italic;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .invitation-text p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        /* Détails de l'événement */
+        .details {
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .details div {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            background: rgba(200, 169, 126, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(200, 169, 126, 0.2);
+            min-width: 260px;
+        }
+
+        .details div:hover {
+            background: rgba(200, 169, 126, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .details i {
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-right: 1rem;
+            min-width: 20px;
+        }
+
+        .details p {
+            font-size: 1rem;
+            color: var(--white);
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+        }
+
+        /* Section table */
+        .table-info {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+            margin: 1rem 0;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            background: rgba(200, 169, 126, 0.15);
+            display: inline-block;
+            border: 1px solid rgba(200, 169, 126, 0.3);
+            border-radius: 6px;
+        }
+
+        /* Style pour les boissons */
+        .drinks-section {
+            margin: 1.5rem auto;
+            text-align: center;
+            max-width: 600px;
+            padding: 1rem 0;
+        }
+
+        .drinks-section h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--white);
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .drinks-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .drink-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(200, 169, 126, 0.3);
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--white);
+            font-weight: 500;
+            min-width: 100px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .drink-option:hover {
+            background: rgba(200, 169, 126, 0.2);
+            border-color: var(--gold);
+        }
+
+        .drink-option.selected {
+            background: var(--gold);
+            color: var(--charcoal);
+            border-color: var(--gold);
+        }
+
+        .selection-counter {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+
+        /* Livre d'or */
+        .guestbook {
+            margin: 1.2rem auto;
+            max-width: 550px;
+            padding: 0;
+        }
+
+        .guestbook h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--white);
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .guestbook textarea {
+            width: 100%;
+            height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--gold);
+            border-radius: 6px;
+            resize: none;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            color: var(--white);
+        }
+
+        .guestbook textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+        }
+
+        .guestbook textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* QR Code */
+        .qr-section {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .qr-code {
+            display: inline-block;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(200, 169, 126, 0.3);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-code img {
+            max-width: 160px;
+            border: 1px solid rgba(200, 169, 126, 0.3);
+            padding: 10px;
+            background: var(--white);
+            border-radius: 6px;
+        }
+
+        .scan-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--gold);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+
+        /* Boutons de confirmation */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 1.2rem;
+        }
+
+        .confirm-btn {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid var(--gold);
+            padding: 10px 25px;
+            font-size: 0.9rem;
+            border-radius: 6px;
+            min-width: 160px;
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background: var(--gold);
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .confirm-btn:hover::before {
+            width: 100%;
+        }
+
+        .confirm-btn:hover {
+            color: var(--charcoal);
+        }
+
+        .btn-cancel {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-cancel::before {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Diviseurs floraux */
+        .floral-divider {
+            text-align: center;
+            font-size: 1.6rem;
+            color: var(--gold);
+            opacity: 0.7;
+            line-height: 1;
+            padding: 0.8rem 0;
+            margin: 0 10px;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
+            .couple-main-image {
+                height: 100vh;
             }
             
-            .photo-section {
-                height: 200px;
+            .red-overlay {
+                height: 35%;
+                padding-bottom: 40px;
             }
             
-            .guest-name {
+            .event-title {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+            
+            .event-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .couple-names p {
+                font-size: 2.2rem;
+            }
+            
+            .invitation-content {
+                padding: 0;
+            }
+
+            .section-container {
+                padding: 1.5rem 1rem;
+                margin: 0 8px;
+            }
+
+            .details div {
+                min-width: 220px;
+                padding: 0.7rem 1rem;
+            }
+
+            .drinks-container {
+                gap: 0.5rem;
+            }
+
+            .drink-option {
+                padding: 0.6rem 1rem;
+                min-width: 90px;
+                font-size: 0.85rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .confirm-btn {
+                min-width: 140px;
+                padding: 8px 20px;
+            }
+
+            .floral-divider {
+                margin: 0 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .couple-main-image {
+                height: 100vh;
+            }
+            
+            .red-overlay {
+                height: 40%;
+                padding-bottom: 30px;
+            }
+            
+            .event-title {
+                font-size: 1.7rem;
+                margin-bottom: 10px;
+            }
+            
+            .event-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .couple-names p {
                 font-size: 1.8rem;
             }
             
-            .content-section {
-                padding: 20px;
+            .couple-names span {
+                font-size: 1.4rem;
+                margin: 0 0.8rem;
             }
             
-            .invitation-text {
-                padding: 15px;
-                font-size: 0.95rem;
+            .invitation-text p {
+                font-size: 1.1rem;
+            }
+            
+            .details p {
+                font-size: 0.9rem;
+            }
+            
+            .floral-divider {
+                font-size: 1.4rem;
+                padding: 0.6rem 0;
+            }
+            
+            .confirm-btn {
+                padding: 8px 18px;
+                font-size: 0.85rem;
+                min-width: 130px;
+            }
+
+            .section-container {
+                margin: 0 5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="invitation-container">
-        <div id="loading" style="text-align: center; color: white; padding: 50px;">
-            <div class="spinner-border" role="status"></div>
-            <p class="mt-3">Chargement de votre invitation...</p>
+    <!-- Pluie de pétales en arrière-plan -->
+    <div class="petals-background" id="petalsBackground"></div>
+
+    <div class="invitation-container" id="invitationContainer">
+        <!-- Image pleine largeur avec couche rougeâtre et titre -->
+        <div class="couple-main-image">
+            <img src="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" alt="Image du couple">
+            <div class="red-overlay">
+                <div class="event-title">Mariage de Guelor et Naomie</div>
+            </div>
         </div>
-        
-        <div id="content" style="display: none;"></div>
-        
-        <div id="error" style="display: none;">
-            <div class="invitation-card">
-                <div class="content-section text-center py-5">
-                    <i class="fas fa-exclamation-circle fa-4x text-danger mb-3"></i>
-                    <h3>Invitation non trouvée</h3>
-                    <p class="text-muted">Le lien que vous avez utilisé n'est pas valide.</p>
-                    <p class="mt-3">Veuillez contacter l'organisateur pour obtenir un nouveau lien.</p>
+
+        <div class="invitation-content">
+            <!-- Section nom de l'invité et noms des mariés -->
+            <div class="section-container" data-aos="fade-up">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="guest-info">
+                    <h3>Couple <span id="guestName">BUASSA</span>,</h3>
+                </div>
+                
+                <div class="couple-names">
+                    <p>Naomie</p>
+                    <span>&</span>
+                    <p>Guelor</p>
+                </div>
+            </div>
+
+            <div class="floral-divider">❀</div>
+
+            <!-- Section message -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="200">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="invitation-text">
+                    <p>Les familles Lupulu et Mokongo ont le réel plaisir de vous inviter au Mariage Civil et Coutumier de leurs enfants; Guelor et Naomie.</p>
+                    <p><strong>Vendredi 06 Mars 2026</strong> - 09H00: Mariage Civil à la Maison Communale de Limete</p>
+                    <p><strong>Samedi 07 Mars 2026</strong> - 19H00: Soirée Dansante à la Salle de Fête GLORIOUS PALACE</p>
+                    <p><i>Av. Mvunda 21, Q/yolo-nord, C/Kalamu - Réf. Hôpital rond-point Yolo Médical en diagonal de la station Cobil</i></p>
+                </div>
+            </div>
+
+            <div class="floral-divider">✽</div>
+
+            <!-- Section lieu et date -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="400">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="details">
+                    <div class="date">
+                        <i class="far fa-calendar-alt"></i>
+                        <p>07/03/2026</p>
+                    </div>
+                    <div class="time">
+                        <i class="far fa-clock"></i>
+                        <p>19:00 - 04:00</p>
+                    </div>
+                    <div class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <p>salle de fête GLORIOUS PALACE<br>Av. Mvunda 21 Q/yolo-nord C/Kalamu - Réf. Hôpital rond point yolo Médical</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="floral-divider">✤</div>
+
+            <!-- Section préférences de boissons -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="600">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <form id="drinkForm">
+                    <input type="hidden" name="_token" value="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05" autocomplete="off">                    
+                    <input type="hidden" name="invitation_code" id="invitationCode">
+                    <input type="hidden" name="boissons[]" id="selectedDrinks">
+                    
+                    <div class="drinks-section">
+                        <h4>Préférences de réception</h4>
+
+                        <div class="drinks-container">
+                            <div class="drink-option" data-value="COCA">COCA</div>
+                            <div class="drink-option" data-value="FANTA">FANTA</div>
+                            <div class="drink-option" data-value="VITALO">VITALO</div>
+                            <div class="drink-option" data-value="MALTINA">MALTINA</div>
+                            <div class="drink-option" data-value="BAVARIA">BAVARIA</div>
+                            <div class="drink-option" data-value="BEAUFORT">BEAUFORT</div>
+                            <div class="drink-option" data-value="CASTAL">CASTAL</div>
+                            <div class="drink-option" data-value="NKOY">NKOY</div>
+                            <div class="drink-option" data-value="LIKOFI">LIKOFI</div>
+                            <div class="drink-option" data-value="SWISSTA">SWISSTA</div>
+                        </div>
+
+                        <div class="selection-counter" id="selectionCounter">
+                            Sélectionnez jusqu'à 2 options
+                        </div>
+
+                        <div style="margin-top: 1.2rem;">
+                            <button type="submit" class="confirm-btn">Confirmer mes choix</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="floral-divider">❁</div>
+            
+            <!-- Section QR Code avec table centrée -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="800">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="qr-section">
+                    <div class="table-info" style="text-align: center; display: block; margin: 0 auto 1.5rem auto;">
+                        Table <span id="tableName">VIP</span>
+                    </div>
+                    
+                    <div class="qr-code">
+                        <img src="" alt="QR Code" id="qrCodeImage">
+                        <div class="scan-text">Scannez-moi</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="floral-divider">✾</div>
+
+            <!-- Section livre d'or -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="1000">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+
+                <div class="guestbook">
+                    <h4>Laissez-nous un message</h4>
+                    <form id="guestbookForm">
+                        <input type="hidden" name="invitation_code" id="guestbookCode">
+                        <textarea name="message" id="guestbookMessage" placeholder="Partagez vos vœux et vos souvenirs avec nous..." required></textarea>
+                        <div style="margin-top: 1.2rem; text-align: center;">
+                            <button type="submit" class="confirm-btn">Envoyer votre message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="floral-divider">♡</div>
+
+            <!-- Section confirmation -->
+            <div class="section-container" data-aos="fade-up" data-aos-delay="1200">
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+                
+                <div class="confirmation-message">
+                    <p style="font-size: 1.1rem; margin-bottom: 1.2rem; font-style: italic; text-align: center; color:white !important; padding:20px">
+                        Votre présence sera le plus beau des cadeaux. ✨
+                    </p>
+                    <div class="btn-container">
+                        <a href="#" class="confirm-btn" id="confirmBtn">
+                            Confirmer ma présence
+                        </a>
+                        <a href="#" class="confirm-btn btn-cancel" id="cancelBtn">
+                            Décliner avec regrets
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- AOS Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <script>
-        // Récupérer les données de l'URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const dataStr = urlParams.get('data');
-        
-        if (!dataStr) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-        } else {
-            try {
-                const data = JSON.parse(atob(decodeURIComponent(dataStr)));
-                
-                // URL complète pour l'affichage
-                const fullUrl = window.location.href;
-                
-                document.getElementById('loading').style.display = 'none';
-                
-                document.getElementById('content').innerHTML = `
-                    <div class="invitation-card">
-                        <div class="photo-section" style="background-image: url('${data.evenementPhoto || 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80'}')"></div>
-                        
-                        <div class="content-section">
-                            <div class="guest-name">${data.nom}</div>
-                            
-                            <div class="special-message">
-                                <i class="fas fa-star me-2"></i>
-                                Vous êtes notre invité(e) spécial(e)
-                            </div>
-                            
-                            <div class="invitation-text">
-                                <p class="mb-2">Cliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :</p>
-                                <div class="invitation-link">
-                                                    <i class="fas fa-link me-2" style="color: var(--gold);"></i>
-                                    ${fullUrl}
-                                </div>
-                            </div>
-                            
-                            <button class="btn-download" onclick="telechargerInvitation()">
-                                <i class="fas fa-download"></i>
-                                Télécharger mon invitation
-                            </button>
-                            
-                            <div class="event-details">
-                                <h5 class="mb-3"><i class="fas fa-calendar-alt me-2" style="color: var(--gold);"></i>Détails de l'événement</h5>
-                                
-                                <div class="detail-item">
-                                    <i class="fas fa-calendar-day"></i>
-                                    <div><strong>Date :</strong> ${data.evenementDate || '07/03/2026'}</div>
-                                </div>
-                                
-                                <div class="detail-item">
-                                    <i class="fas fa-clock"></i>
-                                    <div><strong>Heure :</strong> ${data.evenementHeure || '19:00'}</div>
-                                </div>
-                                
-                                <div class="detail-item">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <div><strong>Lieu :</strong> ${data.evenementLieu || 'GLORIOUS PALACE'}</div>
-                                </div>
-                                
-                                <div class="detail-item">
-                                    <i class="fas fa-location-dot"></i>
-                                    <div><strong>Adresse :</strong> ${data.evenementAdresse || 'Av. Mvunda 21, Kinshasa'}</div>
-                                </div>
-                            </div>
-                            
-                            ${data.evenementMessage ? `
-                                <div class="alert alert-info mt-3">
-                                    <i class="fas fa-quote-left me-2" style="color: var(--gold);"></i>
-                                    ${data.evenementMessage}
-                                </div>
-                            ` : ''}
-                            
-                            <div class="contact-info">
-                                <h5 class="mb-3"><i class="fas fa-phone-alt"></i>Contact organisateur</h5>
-                                <p><i class="fas fa-phone"></i> <a href="tel:${data.evenementTelephone || '+243821248030'}">${data.evenementTelephone || '+243 82 124 8030'}</a></p>
-                                <p><i class="fas fa-envelope"></i> <a href="mailto:${data.evenementEmail || 'guelormuya2@gmail.com'}">${data.evenementEmail || 'guelormuya2@gmail.com'}</a></p>
-                            </div>
-                            
-                            <div class="footer-logo">
-                                Invitation envoyée via <span>Equinoxe Events</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('content').style.display = 'block';
-                
-            } catch (e) {
-                console.error('Erreur:', e);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Récupérer les données de l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataStr = urlParams.get('data');
+            
+            if (dataStr) {
+                try {
+                    const data = JSON.parse(atob(decodeURIComponent(dataStr)));
+                    
+                    // Mettre à jour le nom de l'invité
+                    if (data.nom) {
+                        document.getElementById('guestName').textContent = data.nom;
+                    }
+                    
+                    // Mettre à jour le nom de la table
+                    if (data.tableNom) {
+                        document.getElementById('tableName').textContent = data.tableNom;
+                    }
+                    
+                    // Mettre à jour le code d'invitation
+                    const code = data.id || 'INV2026';
+                    document.getElementById('invitationCode').value = code;
+                    document.getElementById('guestbookCode').value = code;
+                    
+                    // Générer un QR Code (placeholder)
+                    document.getElementById('qrCodeImage').src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(window.location.href);
+                    
+                    // Mettre à jour les liens de confirmation
+                    document.getElementById('confirmBtn').href = '#'; // À remplacer par votre URL de confirmation
+                    document.getElementById('cancelBtn').href = '#'; // À remplacer par votre URL d'annulation
+                    
+                } catch (e) {
+                    console.error('Erreur de parsing des données:', e);
+                }
             }
-        }
-        
-        function telechargerInvitation() {
-            // Créer un élément canvas pour capturer l'invitation
-            const element = document.querySelector('.invitation-card');
+
+            // Créer la pluie de pétales
+            function createPetals() {
+                const petalsContainer = document.getElementById('petalsBackground');
+                const numberOfPetals = 12;
+                const petalSymbols = ['❀', '✿', '❁', '✾', '♡', '🌸'];
+                
+                for (let i = 0; i < numberOfPetals; i++) {
+                    const petal = document.createElement('div');
+                    petal.innerHTML = petalSymbols[Math.floor(Math.random() * petalSymbols.length)];
+                    petal.classList.add('petal');
+                    
+                    petal.style.left = Math.random() * 100 + 'vw';
+                    const duration = Math.random() * 8 + 8;
+                    petal.style.animationDuration = duration + 's';
+                    const size = Math.random() * 12 + 10;
+                    petal.style.fontSize = size + 'px';
+                    petal.style.opacity = Math.random() * 0.3 + 0.2;
+                    petal.style.color = `rgba(${Math.random() * 30 + 200}, ${Math.random() * 30 + 180}, ${Math.random() * 30 + 150}, ${Math.random() * 0.3 + 0.2})`;
+                    
+                    petal.style.animationDelay = Math.random() * 5 + 's';
+                    
+                    petalsContainer.appendChild(petal);
+                }
+            }
             
-            // Option 1: Guide pour capture d'écran
-            alert('Pour télécharger votre invitation :\n\n1. Faites une capture d\'écran (Volume bas + Power sur Android)\n2. Ou utilisez l\'impression PDF (Menu > Imprimer > Enregistrer au format PDF)');
+            createPetals();
+
+            // Initialiser AOS
+            AOS.init({
+                duration: 1000,
+                once: false,
+                easing: 'ease-in-out',
+                offset: 80
+            });
             
-            // Option 2: Ouvrir la boîte de dialogue d'impression
-            // window.print();
-        }
+            // Gestion des options de boissons
+            const drinkOptions = document.querySelectorAll('.drink-option');
+            const selectedDrinksInput = document.getElementById('selectedDrinks');
+            const selectionCounter = document.getElementById('selectionCounter');
+            let selectedDrinks = [];
+            
+            function updateSelectionCounter() {
+                const remaining = 2 - selectedDrinks.length;
+                if (remaining === 2) {
+                    selectionCounter.textContent = 'Sélectionnez jusqu\'à 2 options';
+                } else if (remaining === 1) {
+                    selectionCounter.textContent = '1 sélection supplémentaire possible';
+                } else {
+                    selectionCounter.textContent = 'Maximum atteint';
+                }
+            }
+            
+            drinkOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const drinkValue = this.getAttribute('data-value');
+                    
+                    if (this.classList.contains('selected')) {
+                        // Désélectionner
+                        this.classList.remove('selected');
+                        selectedDrinks = selectedDrinks.filter(drink => drink !== drinkValue);
+                    } else {
+                        // Vérifier la limite
+                        if (selectedDrinks.length >= 2) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Limite atteinte',
+                                text: 'Vous ne pouvez sélectionner que 2 boissons maximum.',
+                                confirmButtonColor: '#8b6b5e',
+                                background: 'var(--dark-overlay)',
+                                color: 'var(--white)'
+                            });
+                            return;
+                        }
+                        
+                        // Sélectionner
+                        this.classList.add('selected');
+                        selectedDrinks.push(drinkValue);
+                    }
+                    
+                    selectedDrinksInput.value = selectedDrinks.join(',');
+                    updateSelectionCounter();
+                });
+            });
+            
+            // Gestion du formulaire de boissons
+            const drinkForm = document.getElementById('drinkForm');
+            if (drinkForm) {
+                drinkForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (selectedDrinks.length === 0) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Sélection requise',
+                            text: 'Veuillez sélectionner au moins une boisson.',
+                            confirmButtonColor: '#8b6b5e',
+                            background: 'var(--dark-overlay)',
+                            color: 'var(--white)'
+                        });
+                        return;
+                    }
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Enregistrement...';
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Préférences enregistrées',
+                            html: `Merci ! Vos choix : <b>${selectedDrinks.join(', ')}</b>`,
+                            confirmButtonColor: '#8b6b5e',
+                            background: 'var(--dark-overlay)',
+                            color: 'var(--white)'
+                        });
+                        
+                        submitBtn.textContent = 'Choix confirmés ✓';
+                        
+                        drinkOptions.forEach(option => {
+                            option.style.pointerEvents = 'none';
+                        });
+                    }, 1500);
+                });
+            }
+
+            // Gestion du formulaire livre d'or
+            const guestbookForm = document.getElementById('guestbookForm');
+            if (guestbookForm) {
+                guestbookForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const message = document.getElementById('guestbookMessage').value;
+                    
+                    if (!message.trim()) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Message requis',
+                            text: 'Veuillez écrire un message.',
+                            confirmButtonColor: '#8b6b5e',
+                            background: 'var(--dark-overlay)',
+                            color: 'var(--white)'
+                        });
+                        return;
+                    }
+                    
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    submitBtn.textContent = 'Envoi...';
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Message envoyé !',
+                            text: 'Merci d\'avoir partagé vos vœux.',
+                            confirmButtonColor: '#8b6b5e',
+                            background: 'var(--dark-overlay)',
+                            color: 'var(--white)'
+                        });
+                        
+                        submitBtn.textContent = 'Message envoyé ✓';
+                        document.getElementById('guestbookMessage').disabled = true;
+                    }, 1500);
+                });
+            }
+
+            // Initialiser le compteur
+            if (selectionCounter) {
+                updateSelectionCounter();
+            }
+        });
     </script>
 </body>
 </html>
