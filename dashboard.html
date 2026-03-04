@@ -105,25 +105,41 @@
         
         .badge-confirmed {
             background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .badge-pending {
             background-color: #ffc107;
             color: #000;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .badge-cancelled {
             background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
         }
         
         .table-card {
             border: 1px solid #e9ecef;
             border-radius: 8px;
             transition: all 0.3s ease;
+            height: 100%;
         }
         
         .table-card:hover {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table-card .card-header {
+            background-color: var(--gold);
+            color: white;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
         }
         
         .guestbook-card {
@@ -467,13 +483,20 @@
             {
                 nom: "MAYONNAISE",
                 capacite: 100,
-                invites: ["Couple Marie & MISENGA (2 personnes)", "Mme MA BLANDINE", "Mr FAMILLE"]
+                invites: ["Couple Marie & MISENGA", "Mme MA BLANDINE", "Mr FAMILLE"]
             },
             {
                 nom: "FRES",
                 capacite: 100,
                 invites: ["Mr FAMILLE", "Mr FAMILLE"]
             }
+        ];
+
+        // Données pour les invités (tableau)
+        let invitesList = [
+            { nom: "Couple Marie & MISENGA", email: "vincentndebwany@gmail.com", telephone: "836963894", statut: "Envoyee", table: "MAYONNAISE", personnes: 2 },
+            { nom: "Mme MA BLANDINE", email: "vincentndebwany@gmail.com", telephone: "836963894", statut: "Envoyee", table: "MAYONNAISE", personnes: 1 },
+            { nom: "Mr FAMILLE", email: "vincentndebwany@gmail.com", telephone: "836963894", statut: "Envoyee", table: "FRES", personnes: 1 }
         ];
 
         // Données pour le livre d'or
@@ -486,7 +509,7 @@
         let currentDesktopPage = 1;
         let currentMobilePage = 1;
         let itemsPerPage = 10;
-        let totalItems = 118;
+        let totalItems = invitesList.length;
         let totalPages = Math.ceil(totalItems / itemsPerPage);
 
         function logout() {
@@ -644,7 +667,7 @@
             
             copyButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const link = this.getAttribute('data-link');
+                    const link = this.getAttribute('data-link') || 'https://www.equinoxe-events.com/invitation/EXAMPLE123';
                     
                     navigator.clipboard.writeText(link)
                         .then(() => {
@@ -669,61 +692,36 @@
             });
         }
 
-        // Fonctions pour modifier les détails de l'événement
+        // Fonctions WhatsApp et Email
+        function envoyerWhatsApp(nom, telephone) {
+            const message = `${nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :\nhttps://www.equinoxe-events.com/invitation/EXAMPLE123`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function envoyerEmail(email, nom) {
+            if (!email) {
+                Swal.fire('Erreur', 'Email non disponible', 'error');
+                return;
+            }
+            const sujet = "Votre invitation";
+            const corps = `${nom}\n\nVous êtes notre invité(e) spécial(e)\n\nCliquez sur le lien ci-dessous pour visualiser et télécharger votre invitation :\nhttps://www.equinoxe-events.com/invitation/EXAMPLE123`;
+            window.location.href = `mailto:${email}?subject=${encodeURIComponent(sujet)}&body=${encodeURIComponent(corps)}`;
+        }
+
         function modifierEvenement() {
             Swal.fire({
                 title: 'Modifier les détails de l\'événement',
                 html: `
-                    <div class="mb-3">
-                        <label class="form-label">Nom de l'événement</label>
-                        <input id="nomEvent" class="form-control" value="${evenement.nom}">
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Date</label>
-                            <input id="dateEvent" class="form-control" value="${evenement.date}">
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Heure</label>
-                            <input id="heureEvent" class="form-control" value="${evenement.heure}">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Lieu</label>
-                        <input id="lieuEvent" class="form-control" value="${evenement.lieu}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse</label>
-                        <textarea id="adresseEvent" class="form-control" rows="2">${evenement.adresse}</textarea>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Organisé par</label>
-                            <input id="organisePar" class="form-control" value="${evenement.organisePar}">
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Contact</label>
-                            <input id="contactEvent" class="form-control" value="${evenement.contact}">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Téléphone</label>
-                            <input id="telephoneEvent" class="form-control" value="${evenement.telephone}">
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Code événement</label>
-                            <input id="codeEvent" class="form-control" value="${evenement.codeEvenement}">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Adresse organisateur</label>
-                        <input id="adresseOrg" class="form-control" value="${evenement.adresseOrganisateur}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Message d'invitation</label>
-                        <textarea id="messageInvitation" class="form-control" rows="3">${evenement.messageInvitation}</textarea>
-                    </div>
+                    <input type="text" id="nomEvent" class="swal2-input" placeholder="Nom de l'événement" value="${evenement.nom}">
+                    <input type="text" id="dateEvent" class="swal2-input" placeholder="Date" value="${evenement.date}">
+                    <input type="text" id="heureEvent" class="swal2-input" placeholder="Heure" value="${evenement.heure}">
+                    <input type="text" id="lieuEvent" class="swal2-input" placeholder="Lieu" value="${evenement.lieu}">
+                    <textarea id="adresseEvent" class="swal2-textarea" placeholder="Adresse">${evenement.adresse}</textarea>
+                    <input type="text" id="organisePar" class="swal2-input" placeholder="Organisé par" value="${evenement.organisePar}">
+                    <input type="email" id="contactEvent" class="swal2-input" placeholder="Contact" value="${evenement.contact}">
+                    <input type="tel" id="telephoneEvent" class="swal2-input" placeholder="Téléphone" value="${evenement.telephone}">
+                    <input type="text" id="adresseOrg" class="swal2-input" placeholder="Adresse organisateur" value="${evenement.adresseOrganisateur}">
+                    <textarea id="messageInvitation" class="swal2-textarea" placeholder="Message d'invitation">${evenement.messageInvitation}</textarea>
                 `,
                 confirmButtonText: 'Enregistrer',
                 confirmButtonColor: '#D4AF37',
@@ -738,14 +736,11 @@
                     evenement.organisePar = document.getElementById('organisePar').value;
                     evenement.contact = document.getElementById('contactEvent').value;
                     evenement.telephone = document.getElementById('telephoneEvent').value;
-                    evenement.codeEvenement = document.getElementById('codeEvent').value;
                     evenement.adresseOrganisateur = document.getElementById('adresseOrg').value;
                     evenement.messageInvitation = document.getElementById('messageInvitation').value;
                     
-                    // Sauvegarder dans localStorage
                     localStorage.setItem('evenement', JSON.stringify(evenement));
                     
-                    // Mettre à jour l'affichage
                     document.getElementById('eventTitle').textContent = evenement.nom;
                     document.getElementById('eventDateLieu').textContent = evenement.date + ' • ' + evenement.lieu;
                     document.getElementById('eventCode').textContent = evenement.codeEvenement;
@@ -769,34 +764,14 @@
                 title: 'Modifier l\'image de l\'événement',
                 html: `
                     <div class="text-center mb-3">
-                        <img src="${evenement.photo}" class="img-fluid rounded mb-3" style="max-height: 200px;">
-                        <p class="text-muted">Image actuelle</p>
+                        <img src="${evenement.photo}" class="img-fluid rounded" style="max-height: 200px;">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">URL de l'image</label>
-                        <input id="imageUrl" class="form-control" value="${evenement.photo}" placeholder="https://...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ou télécharger une image</label>
-                        <input type="file" id="imageFile" class="form-control" accept="image/*">
-                    </div>
+                    <input type="text" id="imageUrl" class="swal2-input" placeholder="URL de l'image" value="${evenement.photo}">
                 `,
                 confirmButtonText: 'Enregistrer',
                 confirmButtonColor: '#D4AF37',
                 showCancelButton: true,
                 cancelButtonText: 'Annuler',
-                didOpen: () => {
-                    document.getElementById('imageFile').addEventListener('change', function(e) {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                document.getElementById('imageUrl').value = e.target.result;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                },
                 preConfirm: () => {
                     const newImage = document.getElementById('imageUrl').value;
                     if (newImage) {
@@ -810,15 +785,19 @@
         }
 
         function ajouterInvite() {
+            let tableOptions = '<option value="">Sélectionner une table</option>';
+            tables.forEach(t => {
+                tableOptions += `<option value="${t.nom}">${t.nom}</option>`;
+            });
+            
             Swal.fire({
                 title: 'Ajouter un invité',
                 html: `
-                    <input type="text" id="nomInvite" class="form-control mb-3" placeholder="Nom de l'invité">
-                    <select id="tableInvite" class="form-control mb-3">
-                        <option value="">Sélectionner une table</option>
-                        ${tables.map(t => `<option value="${t.nom}">${t.nom}</option>`).join('')}
-                    </select>
-                    <select id="statutInvite" class="form-control mb-3">
+                    <input type="text" id="nomInvite" class="swal2-input" placeholder="Nom de l'invité">
+                    <select id="tableInvite" class="swal2-input">${tableOptions}</select>
+                    <input type="email" id="emailInvite" class="swal2-input" placeholder="Email">
+                    <input type="tel" id="telephoneInvite" class="swal2-input" placeholder="Téléphone">
+                    <select id="statutInvite" class="swal2-input">
                         <option value="Envoyee">Envoyée</option>
                         <option value="Confirmee">Confirmée</option>
                     </select>
@@ -828,15 +807,12 @@
                 showCancelButton: true,
                 preConfirm: () => {
                     const nom = document.getElementById('nomInvite').value;
-                    const table = document.getElementById('tableInvite').value;
-                    const statut = document.getElementById('statutInvite').value;
-                    
                     if (!nom) {
                         Swal.showValidationMessage('Le nom est requis');
                         return false;
                     }
                     
-                    Swal.fire('Succès!', 'Invité ajouté avec succès', 'success');
+                    Swal.fire('Succès!', 'Invité ajouté avec succès (simulation)', 'success');
                 }
             });
         }
@@ -845,8 +821,8 @@
             Swal.fire({
                 title: 'Ajouter une table',
                 html: `
-                    <input type="text" id="nomTable" class="form-control mb-3" placeholder="Nom de la table">
-                    <input type="number" id="capaciteTable" class="form-control mb-3" placeholder="Capacité" value="10">
+                    <input type="text" id="nomTable" class="swal2-input" placeholder="Nom de la table">
+                    <input type="number" id="capaciteTable" class="swal2-input" placeholder="Capacité" value="10">
                 `,
                 confirmButtonText: 'Ajouter',
                 confirmButtonColor: '#D4AF37',
@@ -860,17 +836,48 @@
                         return false;
                     }
                     
-                    Swal.fire('Succès!', 'Table ajoutée avec succès', 'success');
+                    Swal.fire('Succès!', 'Table ajoutée avec succès (simulation)', 'success');
+                }
+            });
+        }
+
+        function ajouterMessage() {
+            Swal.fire({
+                title: 'Ajouter un message',
+                html: `
+                    <input type="text" id="inviteMessage" class="swal2-input" placeholder="Nom de l'invité">
+                    <textarea id="messageTexte" class="swal2-textarea" placeholder="Message"></textarea>
+                `,
+                confirmButtonText: 'Ajouter',
+                confirmButtonColor: '#D4AF37',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const invite = document.getElementById('inviteMessage').value;
+                    const message = document.getElementById('messageTexte').value;
+                    
+                    if (!invite || !message) {
+                        Swal.showValidationMessage('Tous les champs sont requis');
+                        return false;
+                    }
+                    
+                    Swal.fire('Succès!', 'Message ajouté avec succès (simulation)', 'success');
                 }
             });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Charger les données sauvegardées
             const savedEvent = localStorage.getItem('evenement');
             if (savedEvent) {
                 evenement = JSON.parse(savedEvent);
             }
+            
+            // Mise à jour des statistiques
+            document.getElementById('statInvitations').textContent = stats.invitationsEmises;
+            document.getElementById('statConfirmees').textContent = stats.invitationsConfirmees;
+            document.getElementById('statAttente').textContent = stats.invitationsEnAttente;
+            document.getElementById('statMessages').textContent = stats.messagesLivreOr;
+            document.getElementById('totalInvitations').textContent = stats.invitationsEmises;
+            document.getElementById('totalPersonnes').textContent = stats.totalPersonnes;
             
             initPagination();
             setupCopyButtons();
@@ -960,7 +967,7 @@
                                 <div class="text-gold mb-2">
                                     <i class="fas fa-envelope fa-2x"></i>
                                 </div>
-                                <div class="stat-number">${stats.invitationsEmises}</div>
+                                <div class="stat-number" id="statInvitations">118</div>
                                 <p class="card-text">Invitations émises</p>
                             </div>
                         </div>
@@ -972,7 +979,7 @@
                                 <div class="text-success mb-2">
                                     <i class="fas fa-check-circle fa-2x"></i>
                                 </div>
-                                <div class="stat-number">${stats.invitationsConfirmees}</div>
+                                <div class="stat-number" id="statConfirmees">7</div>
                                 <p class="card-text">Invitations confirmées</p>
                             </div>
                         </div>
@@ -984,7 +991,7 @@
                                 <div class="text-warning mb-2">
                                     <i class="fas fa-clock fa-2x"></i>
                                 </div>
-                                <div class="stat-number">${stats.invitationsEnAttente}</div>
+                                <div class="stat-number" id="statAttente">111</div>
                                 <p class="card-text">Invitations en attente</p>
                             </div>
                         </div>
@@ -996,7 +1003,7 @@
                                 <div class="text-info mb-2">
                                     <i class="fas fa-book fa-2x"></i>
                                 </div>
-                                <div class="stat-number">${stats.messagesLivreOr}</div>
+                                <div class="stat-number" id="statMessages">8</div>
                                 <p class="card-text">Messages livre d'or</p>
                             </div>
                         </div>
@@ -1015,8 +1022,8 @@
                                     <div class="col-md-12">
                                         <div class="mb-3">
                                             <ul class="list-unstyled">
-                                                <li><strong>Total invitations:</strong> ${stats.invitationsEmises}</li>
-                                                <li><strong>Total personnes:</strong> ${stats.totalPersonnes}</li>
+                                                <li><strong>Total invitations:</strong> <span id="totalInvitations">118</span></li>
+                                                <li><strong>Total personnes:</strong> <span id="totalPersonnes">183</span></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -1038,21 +1045,21 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <p id="detailDate"><strong>Date:</strong> ${evenement.date}</p>
-                                        <p id="detailHeure"><strong>Heure:</strong> ${evenement.heure}</p>
-                                        <p id="detailLieu"><strong>Lieu:</strong> ${evenement.lieu}</p>
-                                        <p id="detailAdresse"><strong>Adresse:</strong> ${evenement.adresse}</p>
+                                        <p id="detailDate"><strong>Date:</strong> 07/03/2026</p>
+                                        <p id="detailHeure"><strong>Heure:</strong> 19:00 - 04:00</p>
+                                        <p id="detailLieu"><strong>Lieu:</strong> salle de fête GLORIOUS PALACE</p>
+                                        <p id="detailAdresse"><strong>Adresse:</strong> Av. Mvunda 21 Q/yolo-nord C/Kalamu - Réf. Hopital rond point yolo Médical</p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p id="detailOrganisePar"><strong>Organisé par:</strong> ${evenement.organisePar}</p>
-                                        <p id="detailContact"><strong>Contact:</strong> ${evenement.contact}</p>
-                                        <p id="detailTelephone"><strong>Téléphone:</strong> ${evenement.telephone}</p>
-                                        <p id="detailAdresseOrg"><strong>Adresse:</strong> ${evenement.adresseOrganisateur}</p>
+                                        <p id="detailOrganisePar"><strong>Organisé par:</strong> mulamba</p>
+                                        <p id="detailContact"><strong>Contact:</strong> service.client.innovatech@gmail.com</p>
+                                        <p id="detailTelephone"><strong>Téléphone:</strong> 0821248030</p>
+                                        <p id="detailAdresseOrg"><strong>Adresse:</strong> Kikwit2, Num 17, mazamba, kinshasa</p>
                                     </div>
                                 </div>
                                 <div class="mt-3">
                                     <h6>Message d'invitation:</h6>
-                                    <p id="detailMessage" class="text-muted">${evenement.messageInvitation}</p>
+                                    <p id="detailMessage" class="text-muted">Les familles Lupulu et Mokongo ont le réel plaisir de vous inviter au Mariage Civil et Coutumier de leurs enfants; Guelor et Naomie.</p>
                                 </div>
                             </div>
                         </div>
@@ -1066,7 +1073,8 @@
                                 </button>
                             </div>
                             <div class="card-body text-center">
-                                <img src="${evenement.photo}" alt="Mariage" class="img-fluid rounded" id="eventImage" style="cursor: pointer;" onclick="modifierImage()">
+                                <img src="https://www.equinoxe-events.com/storage/invitation/aAuWbSZewRMtlNZuD4MkPKitxkGVJvqRxQTaRDoW.jpg" 
+                                     alt="Mariage" class="img-fluid rounded" id="eventImage" style="cursor: pointer;" onclick="modifierImage()">
                             </div>
                         </div>
                     </div>
@@ -1079,7 +1087,7 @@
                     <h4>
                         Gestion des Invitations
                         <span class="stats">
-                            (${stats.invitationsEmises} invitations / ${stats.totalPersonnes} personnes)
+                            (118 invitations / 183 personnes)
                         </span>
                     </h4>
 
@@ -1088,7 +1096,7 @@
                             <i class="fas fa-plus me-1"></i> Ajouter
                         </button>
                         <a class="btn btn-gold download-btn"
-                           href="https://www.equinoxe-events.com/invites/download/mariage-de-guelor-et-naomie-913272599075035261">
+                           href="#">
                             <i class="fas fa-file-csv me-1"></i> Télécharger
                         </a>
                     </div>
@@ -1122,9 +1130,9 @@
                                             </td>
                                             <td>Table MAYONNAISE</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
-                                                <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
-                                                <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                                <button class="btn btn-sm btn-outline-primary mb-1" onclick="modifierEvenement()"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-success mb-1" onclick="envoyerWhatsApp('Couple Marie & MISENGA', '836963894')"><i class="fab fa-whatsapp"></i></button>
+                                                <button class="btn btn-sm btn-primary mb-1" onclick="envoyerEmail('vincentndebwany@gmail.com', 'Couple Marie & MISENGA')"><i class="fas fa-envelope"></i></button>
                                                 <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
                                             </td>
                                         </tr>
@@ -1139,9 +1147,9 @@
                                             </td>
                                             <td>Table MAYONNAISE</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
-                                                <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
-                                                <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                                <button class="btn btn-sm btn-outline-primary mb-1" onclick="modifierEvenement()"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-success mb-1" onclick="envoyerWhatsApp('Mme MA BLANDINE', '836963894')"><i class="fab fa-whatsapp"></i></button>
+                                                <button class="btn btn-sm btn-primary mb-1" onclick="envoyerEmail('vincentndebwany@gmail.com', 'Mme MA BLANDINE')"><i class="fas fa-envelope"></i></button>
                                                 <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
                                             </td>
                                         </tr>
@@ -1156,9 +1164,9 @@
                                             </td>
                                             <td>Table FRES</td>
                                             <td>
-                                                <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
-                                                <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
-                                                <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                                <button class="btn btn-sm btn-outline-primary mb-1" onclick="modifierEvenement()"><i class="fas fa-edit"></i></button>
+                                                <button class="btn btn-sm btn-success mb-1" onclick="envoyerWhatsApp('Mr FAMILLE', '836963894')"><i class="fab fa-whatsapp"></i></button>
+                                                <button class="btn btn-sm btn-primary mb-1" onclick="envoyerEmail('vincentndebwany@gmail.com', 'Mr FAMILLE')"><i class="fas fa-envelope"></i></button>
                                                 <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
                                             </td>
                                         </tr>
@@ -1166,7 +1174,7 @@
                                 </table>
                                 
                                 <div class="pagination-info" id="desktopPaginationInfo">
-                                    Affichage de <span id="desktopStart">1</span> à <span id="desktopEnd">10</span> sur <span id="desktopTotal">${stats.invitationsEmises}</span> invitations
+                                    Affichage de <span id="desktopStart">1</span> à <span id="desktopEnd">10</span> sur <span id="desktopTotal">118</span> invitations
                                 </div>
                                 
                                 <div class="pagination-container" id="desktopPaginationContainer"></div>
@@ -1197,8 +1205,8 @@
                                 
                                 <div class="mobile-guest-actions">
                                     <button class="btn btn-sm btn-outline-primary mb-1"><i class="fas fa-edit"></i></button>
-                                    <a href="#" class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></a>
-                                    <a href="#" class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></a>
+                                    <button class="btn btn-sm btn-success mb-1"><i class="fab fa-whatsapp"></i></button>
+                                    <button class="btn btn-sm btn-primary mb-1"><i class="fas fa-envelope"></i></button>
                                     <button class="btn btn-sm btn-outline-secondary mb-1 copy-link-btn"><i class="fas fa-link"></i></button>
                                 </div>
                             </div>
@@ -1206,7 +1214,7 @@
                     </div>
                     
                     <div class="pagination-info" id="mobilePaginationInfo">
-                        Affichage de <span id="mobileStart">1</span> à <span id="mobileEnd">10</span> sur <span id="mobileTotal">${stats.invitationsEmises}</span> invitations
+                        Affichage de <span id="mobileStart">1</span> à <span id="mobileEnd">10</span> sur <span id="mobileTotal">118</span> invitations
                     </div>
                     
                     <div class="pagination-container" id="mobilePaginationContainer"></div>
@@ -1223,43 +1231,66 @@
                 </div>
                 
                 <div class="row">
-                    ${tables.map(table => `
                     <div class="col-md-4 mb-4">
                         <div class="card table-card shadow-sm h-100">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Table : ${table.nom}</h5>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                </div>
+                                <h5 class="mb-0">Table : LA TEAM</h5>
+                                <small class="text-muted">Capacité: 100</small>
                             </div>
                             <div class="card-body">
-                                <small class="text-muted">Capacité: ${table.capacite} personnes</small>
-                                <ul class="list-group list-group-flush mt-2">
-                                    ${table.invites.map(invite => `
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        ${invite}
-                                        <div>
-                                            <button class="btn btn-sm btn-link text-primary"><i class="fas fa-edit"></i></button>
-                                            <button class="btn btn-sm btn-link text-danger"><i class="fas fa-trash"></i></button>
-                                        </div>
-                                    </li>
-                                    `).join('')}
-                                    <li class="list-group-item">
-                                        <button class="btn btn-sm btn-link text-success w-100" onclick="ajouterInvite()">
-                                            <i class="fas fa-plus me-1"></i> Ajouter un invité
-                                        </button>
-                                    </li>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Mr LA TEAM</li>
+                                    <li class="list-group-item">Mr FAMILLE</li>
                                 </ul>
                             </div>
                             <div class="card-footer">
                                 <small class="text-muted">
-                                    <strong>${table.invites.length}/${table.capacite} places occupées</strong>
+                                    <strong>2/100 places occupées</strong>
                                 </small>
                             </div>
                         </div>
                     </div>
-                    `).join('')}
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card table-card shadow-sm h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Table : MAYONNAISE</h5>
+                                <small class="text-muted">Capacité: 100</small>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Couple Marie & MISENGA <span class="badge bg-info ms-2">2 pers</span></li>
+                                    <li class="list-group-item">Mme MA BLANDINE</li>
+                                    <li class="list-group-item">Mr FAMILLE</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    <strong>4/100 places occupées</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-4">
+                        <div class="card table-card shadow-sm h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Table : FRES</h5>
+                                <small class="text-muted">Capacité: 100</small>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">Mr FAMILLE</li>
+                                    <li class="list-group-item">Mr FAMILLE</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">
+                                    <strong>2/100 places occupées</strong>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1284,20 +1315,12 @@
                             <tr>
                                 <th scope="col">Invité</th>
                                 <th scope="col">Message</th>
-                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${guestbook.map(entry => `
-                            <tr>
-                                <td>${entry.invite}</td>
-                                <td>"${entry.message}"</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            `).join('')}
+                            <tr><td>Couple Andy</td><td>"Heureux mariage"</td></tr>
+                            <tr><td>Couple MUDIMBI</td><td>"Heureux mariage à vous !"</td></tr>
+                            <tr><td>Mr MUTOMBO</td><td>"Merci pour l'honneur, félicitations !"</td></tr>
                         </tbody>
                     </table>
                 </div>
