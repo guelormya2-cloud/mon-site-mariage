@@ -1,4 +1,4 @@
-<!-- Modal d'AJOUT d'invitation - NOUVELLE VERSION -->
+<!-- Modal d'AJOUT d'invitation - VERSION FINALE -->
 <div class="modal fade" id="addInvitationModal" tabindex="-1" aria-labelledby="addInvitationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -8,9 +8,60 @@
             </div>
             <form id="addInvitationForm" method="POST" action="https://www.equinoxe-events.com/invites/create">
                 <input type="hidden" name="_token" value="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05" autocomplete="off">
-                <!-- On utilise POST pour la création -->
+                <!-- PAS de champ _method, on utilise POST -->
                 <div class="modal-body">
-                    <!-- ... reste du formulaire ... -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_civilite" class="form-label">Civilité</label>
+                            <select class="form-select" id="add_civilite" name="civilite" required onchange="updateAddPlacesRemaining()">
+                                <option value="Monsieur">Monsieur</option>
+                                <option value="Madame">Madame</option>
+                                <option value="Mademoiselle">Mademoiselle</option>
+                                <option value="Couple">Couple</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_nom" class="form-label">Nom complet</label>
+                            <input type="text" class="form-control" id="add_nom" name="nom_invite" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="add_email" name="email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_telephone" class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" id="add_telephone" name="telephone">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="add_statut" class="form-label">Statut</label>
+                            <select class="form-select" id="add_statut" name="statut" required>
+                                <option value="envoyee">Envoyée</option>
+                                <option value="confirmee">Confirmée</option>
+                                <option value="annulee">Annulée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="add_table_id" class="form-label">Table</label>
+                            <select class="form-select" id="add_table_id" name="table_id" onchange="updateAddPlacesRemaining()">
+                                <option value="">Aucune table</option>
+                                @foreach($tables as $table)
+                                <option value="{{ $table->id }}" 
+                                    data-capacite="{{ $table->capacite }}"
+                                    data-places-occupees="{{ $table->places_occupees }}"
+                                    data-places-restantes="{{ $table->places_restantes }}">
+                                    {{ $table->nom }} ({{ $table->places_restantes }}/{{ $table->capacite }} places restantes)
+                                </option>
+                                @endforeach
+                            </select>
+                            <div class="mt-2" id="add-capacity-alert"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
@@ -21,7 +72,7 @@
     </div>
 </div>
 
-<!-- Modal d'AJOUT de table - NOUVELLE VERSION -->
+<!-- Modal d'AJOUT de table - VERSION FINALE -->
 <div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -31,7 +82,7 @@
             </div>
             <form method="POST" action="https://www.equinoxe-events.com/tables/create">
                 <input type="hidden" name="_token" value="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05" autocomplete="off">
-                <!-- On utilise POST pour la création -->
+                <!-- PAS de champ _method, on utilise POST -->
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="table_nom" class="form-label">Nom de la table</label>
