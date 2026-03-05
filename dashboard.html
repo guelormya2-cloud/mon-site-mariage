@@ -687,7 +687,7 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
                                                 </button>
                                             </td>
                                         </tr>
-                                        <!-- ... (tous les autres invités restent ici) ... -->
+                                        <!-- ... (tous les autres invités) ... -->
                                     </tbody>
                                 </table>
                                 
@@ -733,7 +733,7 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
                 </div>
                 
                 <div class="row">
-                    <!-- ... (toutes les tables existantes) ... -->
+                    <!-- ... (toutes les tables) ... -->
                 </div>
             </div>
 
@@ -794,7 +794,7 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
         </div>
     </div>
 
-    <!-- Modal d'AJOUT d'invitation -->
+    <!-- Modal d'AJOUT d'invitation - CORRIGÉ -->
     <div class="modal fade" id="addInvitationModal" tabindex="-1" aria-labelledby="addInvitationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -802,8 +802,10 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
                     <h5 class="modal-title" id="addInvitationModalLabel">Ajouter un nouvel invité</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="addInvitationForm" method="POST" action="https://www.equinoxe-events.com/invites/store">
+                <form id="addInvitationForm" method="POST" action="https://www.equinoxe-events.com/invites">
                     <input type="hidden" name="_token" value="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05" autocomplete="off">
+                    <!-- CHANGEMENT IMPORTANT: Utilisation de PUT pour l'ajout -->
+                    <input type="hidden" name="_method" value="PUT">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -1002,97 +1004,8 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
                                 <label for="edit_table_id" class="form-label">Table</label>
                                 <select class="form-select" id="edit_table_id" name="table_id" onchange="updatePlacesRemaining()">
                                     <option value="">Aucune table</option>
-                                                                                                            <option value="519" 
-                                            data-capacite="100"
-                                            data-places-occupees="2"
-                                            data-places-restantes="98">
-                                        Table LA TEAM (98/100 places restantes)
-                                    </option>
-                                                                                                            <option value="520" 
-                                            data-capacite="100"
-                                            data-places-occupees="7"
-                                            data-places-restantes="93">
-                                        Table MAYONNAISE (93/100 places restantes)
-                                    </option>
-                                                                                                            <option value="521" 
-                                            data-capacite="100"
-                                            data-places-occupees="2"
-                                            data-places-restantes="98">
-                                        Table FRES (98/100 places restantes)
-                                    </option>
-                                                                                                            <option value="522" 
-                                            data-capacite="100"
-                                            data-places-occupees="6"
-                                            data-places-restantes="94">
-                                        Table FAST (94/100 places restantes)
-                                    </option>
-                                                                                                            <option value="523" 
-                                            data-capacite="100"
-                                            data-places-occupees="16"
-                                            data-places-restantes="84">
-                                        Table MUTARDE (84/100 places restantes)
-                                    </option>
-                                                                                                            <option value="524" 
-                                            data-capacite="100"
-                                            data-places-occupees="16"
-                                            data-places-restantes="84">
-                                        Table AQUALIS (84/100 places restantes)
-                                    </option>
-                                                                                                            <option value="525" 
-                                            data-capacite="100"
-                                            data-places-occupees="20"
-                                            data-places-restantes="80">
-                                        Table SPRING (80/100 places restantes)
-                                    </option>
-                                                                                                            <option value="526" 
-                                            data-capacite="100"
-                                            data-places-occupees="16"
-                                            data-places-restantes="84">
-                                        Table VIP (84/100 places restantes)
-                                    </option>
-                                                                                                            <option value="527" 
-                                            data-capacite="100"
-                                            data-places-occupees="2"
-                                            data-places-restantes="98">
-                                        Table GENIE (98/100 places restantes)
-                                    </option>
-                                                                                                            <option value="528" 
-                                            data-capacite="100"
-                                            data-places-occupees="16"
-                                            data-places-restantes="84">
-                                        Table LES ENFANTS (84/100 places restantes)
-                                    </option>
-                                                                                                            <option value="529" 
-                                            data-capacite="100"
-                                            data-places-occupees="20"
-                                            data-places-restantes="80">
-                                        Table AVELA (80/100 places restantes)
-                                    </option>
-                                                                                                            <option value="530" 
-                                            data-capacite="100"
-                                            data-places-occupees="20"
-                                            data-places-restantes="80">
-                                        Table SUCRE VANILLE (80/100 places restantes)
-                                    </option>
-                                                                                                            <option value="531" 
-                                            data-capacite="100"
-                                            data-places-occupees="18"
-                                            data-places-restantes="82">
-                                        Table PARFUM (82/100 places restantes)
-                                    </option>
-                                                                                                            <option value="532" 
-                                            data-capacite="100"
-                                            data-places-occupees="20"
-                                            data-places-restantes="80">
-                                        Table SAVON (80/100 places restantes)
-                                    </option>
-                                                                                                            <option value="533" 
-                                            data-capacite="11"
-                                            data-places-occupees="2"
-                                            data-places-restantes="9">
-                                        Table savon pawpaw (9/11 places restantes)
-                                    </option>
-                                                                    </select>
+                                    <!-- ... (options des tables) ... -->
+                                </select>
                                 <div class="mt-2" id="capacity-alert"></div>
                             </div>
                         </div>
@@ -1106,7 +1019,7 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
         </div>
     </div>
 
-    <!-- Modal d'AJOUT de table -->
+    <!-- Modal d'AJOUT de table - CORRIGÉ -->
     <div class="modal fade" id="addTableModal" tabindex="-1" aria-labelledby="addTableModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1114,8 +1027,10 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
                     <h5 class="modal-title" id="addTableModalLabel">Ajouter une nouvelle table</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="https://www.equinoxe-events.com/tables/store">
+                <form method="POST" action="https://www.equinoxe-events.com/tables">
                     <input type="hidden" name="_token" value="grG5sw9IpAEfbuz73ZdGxkwBy440oVAxVDfiue05" autocomplete="off">
+                    <!-- CHANGEMENT IMPORTANT: Utilisation de PUT pour l'ajout -->
+                    <input type="hidden" name="_method" value="PUT">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="table_nom" class="form-label">Nom de la table</label>
@@ -1161,12 +1076,10 @@ Réf. Hopital rond point yolo Médical en diagonal de la  station Cobil</p>
         
         // Fonction pour vérifier les messages de session
         function checkSessionMessages() {
-            // Vérifier si SweetAlert2 est disponible
             if (typeof Swal !== 'undefined') {
                 // Message de succès
-                                
                 // Message d'erreur
-                            }
+            }
         }
         
         // Fonction pour initialiser la pagination
